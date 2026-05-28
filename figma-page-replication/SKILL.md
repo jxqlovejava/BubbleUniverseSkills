@@ -4,7 +4,7 @@ description: |
   Figma 设计稿 → 应用页面完整复刻工作流。支持 Flutter / React Native / Compose 等任意 UI 框架。
   核心流程 P→A→I→E→V→B：准备 Figma 上下文 → 模块分析与策略判定 → 资源收集 → 逐模块构建
   → 多维度验证 → 边界陷阱参考。内置双轨策略引擎（整图导出 vs 原生 Widget 渲染）、
-  设计标记自动映射、底部 CTA 滚动自适应阴影模式、6 类常见陷阱自动规避。
+  设计标记自动映射、底部 CTA 滚动自适应阴影模式、7 类常见陷阱自动规避。
   适用于活动落地页、招募页、推广页、功能引导页等任何 Figma → Code 场景。
 tags: [figma, landing-page, design-to-code, flutter, react-native, compose, page-replication]
 ---
