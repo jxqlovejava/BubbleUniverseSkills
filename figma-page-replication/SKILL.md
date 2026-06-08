@@ -6,7 +6,7 @@ description: |
   → 多维度验证 → 边界陷阱参考。内置双轨策略引擎（整图导出 vs 原生 Widget 渲染）、
   设计标记自动映射、底部 CTA 滚动自适应阴影模式、7 类常见陷阱自动规避。
   适用于活动落地页、招募页、推广页、功能引导页等任何 Figma → Code 场景。
-tags: [figma, landing-page, design-to-code, flutter, react-native, compose, page-replication]
+tags: [figma, landing-page, design-to-code, flutter, react-native, compose, page-replication, manifest, image-to-code]
 ---
 
 # Figma 页面复刻工作流
@@ -83,9 +83,60 @@ get_design_context(nodeId, fileKey) → 解析所有子节点
 | 模块仅为**纯文本**（无论是否有富文本样式） | **B**：Widget渲染 |
 | 模块为**简单按钮**（渐变纯色、无纹理） | **B**：Widget渲染 |
 
-### A4: 用户确认
+### A3: 输出 manifest
 
-展示分析表，等待用户确认策略分配。确认后进入资源收集阶段。
+将分析表转换为 `layers.manifest.json`，作为后续 E 阶段（构建）和 V 阶段（验证）的单一数据源。
+
+```json
+{
+  "version": "1.0.0",
+  "source": {
+    "type": "figma",
+    "source_width": 390,
+    "source_height": 844,
+    "target_width": 390,
+    "target_height": 844,
+    "scale": 1.0
+  },
+  "layers": [
+    {
+      "id": "hero_banner",
+      "type": "bitmap",
+      "strategy": "A",
+      "source_bbox": { "x": 16, "y": 76, "width": 358, "height": 112 },
+      "scaled_bbox": { "x": 16, "y": 76, "width": 358, "height": 112 },
+      "z_index": 10,
+      "asset": "assets/hero_banner_3x.png",
+      "figma_node_id": "123:456",
+      "gap_to_next": 12
+    }
+  ]
+}
+```
+
+**规则**：
+- `figma_node_id` 记录对应 Figma 节点，便于追溯
+- `gap_to_next` 记录与下一模块的垂直间距
+- `strategy` 必须通过 A3 判定规则分配
+- 统一使用 BubbleUniverseSkills [manifest 规范](../references/manifest-spec.md)
+
+### A4: 预览模块边界
+
+在 Figma 截图上用脚本标注各模块边界，验证分析表的模块划分是否准确：
+
+```bash
+scripts/preview_modules.py figma-screenshot.png layers.manifest.json qa/module-preview.png
+```
+
+- 红色框 = Strategy A（整图导出）
+- 蓝色框 = Strategy B（原生渲染）
+- 青色线 = gap_to_next 间距指示
+
+检查框选区域是否完整覆盖每个模块，不框到相邻元素。边界不准时，先改 manifest，再重新预览。
+
+### A5: 用户确认
+
+展示分析表 + 模块边界预览图，等待用户确认策略分配。确认后进入资源收集阶段。
 
 ---
 
@@ -93,10 +144,23 @@ get_design_context(nodeId, fileKey) → 解析所有子节点
 
 根据分析表收集策略 A 的资源：
 
-1. 列出所有标记为 **策略 A** 的模块
+1. 列出所有标记为 **策略 A** 的模块（从 `layers.manifest.json` 筛选 `strategy="A"`）
 2. 请用户从 Figma 桌面端逐个导出 3x PNG → 本地目录（如 `~/Downloads/`）
 3. 复制到项目资源目录下（路径从 P4 确认）
 4. 优先检查用户本地是否有已有高清版本（避免 Figma API 1x 模糊）
+5. **运行资源审计**：
+
+```bash
+scripts/audit_assets.py assets/ \
+  --manifest layers.manifest.json \
+  --no-black-bg \
+  --min-dimension 200
+```
+
+检查项：
+- 资源尺寸是否匹配 manifest 预期（检测 1x 误导出）
+- 是否有黑色背景（Figma 导出常见问题）
+- 文件大小是否正常（检测空白导出）
 
 **注意**：Figma API 的 `get_screenshot` 只能输出 1x 设计分辨率 → **永远不要用作策略 A 的最终资源**。
 
@@ -350,9 +414,33 @@ Widget _buildBottomBar(BuildContext context) {
 
 拿出 **A2 分析表**，在设备上逐模块对照：位置、尺寸、清晰度、样式是否与设计一致。
 
-### V2: 视觉对比
+### V2: 视觉对比（量化）
 
 重新调用 `get_screenshot(nodeId, fileKey)` 获取原始设计截图，与设备显示对比。
+
+**使用脚本做像素级量化对比**：
+
+```bash
+scripts/compare_images.py figma-reference.png device-screenshot.png --json --output-diff qa/diff-heatmap.png
+```
+
+输出指标：
+- `changed_pixel_ratio`: 变化像素比例（目标 < 0.05）
+- `mae`: 平均绝对误差（目标 < 5）
+- `rmse`: 均方根误差（目标 < 10）
+- `max_rgb_diff`: 最大 RGB 差异（目标 < 30）
+
+`--output-diff` 生成差异热力图，红色区域 = 差异最大，便于定位问题模块。
+
+### V2.5: 模块边界复核
+
+如 V2 发现差异，重新运行模块边界预览，确认差异来自哪个模块：
+
+```bash
+scripts/preview_modules.py device-screenshot.png layers.manifest.json qa/device-modules.png
+```
+
+逐模块对照 manifest 中的 bbox 和 gap 值，定位错位/遗漏模块。
 
 ### V3: 交互检查
 
@@ -381,3 +469,20 @@ Widget _buildBottomBar(BuildContext context) {
 | 5 | **调试器超时** | 连不上 | 停掉旧进程后重试 |
 | 6 | **模块遗漏** | 某个设计元素未实现 | 严格按 A2 分析表逐项对照 V1 |
 | 7 | **图片拉伸变形** | `BoxFit.fill` 改变比例 | 用 `BoxFit.fitWidth` + `ClipRRect` |
+| 8 | **Manifest 缺失** | 代码位置与 Figma 设计值不一致 | 所有模块必须先入 `layers.manifest.json` |
+| 9 | **1x 资源误用** | 策略 A 模块模糊 | 运行 `audit_assets.py --min-dimension` 检测 |
+| 10 | **模块边界不准** | 截图叠图时发现模块裁切/偏移 | 用 `preview_modules.py` 提前校验 bbox |
+
+---
+
+## 统一 Manifest 规范
+
+本 skill 使用 BubbleUniverseSkills 统一的 `layers.manifest.json` 格式作为所有模块的唯一数据源。
+
+- **规范位置**：`references/manifest-spec.md`
+- **核心原则**：`source_bbox` 来自 Figma 提取 → `scaled_bbox` 由 scale 计算 → 代码实现必须追溯到 manifest
+- **与 image-to-code skill 共享**：相同的 manifest 格式，不同的 `source.type`（`figma` vs `image`）
+
+当用户同时提供 Figma 链接和图片参考时，两个 skill 可以基于同一 manifest 协作：
+- `figma-page-replication` 负责从 Figma 提取结构化数据和初始 manifest
+- `image-to-code` 负责从图片提取额外资源和补充切图
