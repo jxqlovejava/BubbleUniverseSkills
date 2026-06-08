@@ -9,6 +9,7 @@
 | Skill | 简介 | 适用场景 |
 |-------|------|---------|
 | [figma-page-replication](./figma-page-replication/README.md) | Figma 设计稿 → 应用页面完整复刻工作流 | 活动页、落地页、招募页等任意 Figma → Code 场景 |
+| [image-to-code](./image-to-code/README.md) | UI 截图/设计图 → 代码 + 透明 PNG 切图资源 | 移动端截图还原、750px 像素级复刻、图标/插画提取 |
 
 ---
 
@@ -23,14 +24,43 @@
 
 ---
 
+## 🔗 统一规范
+
+### `layers.manifest.json` — 跨 Skill 的单一数据源
+
+所有 design-to-code Skill 共用统一的 manifest 格式：
+
+- **位置**：`references/manifest-spec.md`
+- **作用**：连接分析 → 资源导出 → 代码实现 → 验收验证 的全流程数据契约
+- **兼容**：`figma-page-replication`（`source.type = "figma"`）和 `image-to-code`（`source.type = "image"`）
+
 ## 🗂 目录结构
 
 ```
 BubbleUniverseSkills/
 ├── README.md                        # 本文件
-└── figma-page-replication/
+├── references/
+│   └── manifest-spec.md             # 统一 manifest 规范
+├── figma-page-replication/
+│   ├── README.md                    # 安装指南 + 平台适配 + FAQ
+│   ├── SKILL.md                     # P→A→I→E→V→B 核心流程 + 代码模板
+│   ├── references/
+│   │   └── manifest-spec.md         # 引用统一规范
+│   └── scripts/
+│       ├── compare_images.py        # 像素级图片对比
+│       ├── preview_modules.py       # 模块边界预览
+│       └── audit_assets.py          # 资源审计
+└── image-to-code/
     ├── README.md                    # 安装指南 + 平台适配 + FAQ
-    └── SKILL.md                     # P→A→I→E→V→B 核心流程 + 代码模板
+    ├── SKILL.md                     # S→M→E→C→V→D 核心流程
+    ├── references/
+    │   ├── manifest-spec.md         # 引用统一规范
+    │   └── slicing.md               # 切图与导出规范
+    └── scripts/
+        ├── preview_bboxes.py        # bbox 预览
+        ├── extract_png_asset.py     # 精确 bbox 导出 PNG
+        ├── audit_png_assets.py      # PNG 审计
+        └── compare_images.py        # 像素级图片对比
 ```
 
 ---
