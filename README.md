@@ -8,6 +8,7 @@
 
 | Skill | 简介 | 适用场景 |
 |-------|------|---------|
+| [gcp](./gcp/SKILL.md) | Git Commit & Push 智能分组提交 + 自动同步推送 | 多文件变更自动分组 commit、工作区干净时自动 pull/push 同步 |
 | [figma-page-replication](./figma-page-replication/README.md) | Figma 设计稿 → 应用页面完整复刻工作流 | 活动页、落地页、招募页等任意 Figma → Code 场景 |
 | [image-to-code](./image-to-code/README.md) | UI 截图/设计图 → 代码 + 透明 PNG 切图资源 | 移动端截图还原、750px 像素级复刻、图标/插画提取 |
 
@@ -41,6 +42,8 @@ BubbleUniverseSkills/
 ├── README.md                        # 本文件
 ├── references/
 │   └── manifest-spec.md             # 统一 manifest 规范
+├── gcp/
+│   └── SKILL.md                     # Git Commit & Push 智能分组工作流
 ├── figma-page-replication/
 │   ├── README.md                    # 安装指南 + 平台适配 + FAQ
 │   ├── SKILL.md                     # P→A→I→E→V→B 核心流程 + 代码模板
