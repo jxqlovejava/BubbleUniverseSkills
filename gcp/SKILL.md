@@ -195,19 +195,41 @@ Skip push entirely.
 
 If local is ahead:
 
+### Push with SSH → HTTPS Fallback
+
+First, try normal push:
+```bash
+git push origin <current-branch>
+```
+
+**If push fails with SSH errors** (timeout, `broken pipe`, `Could not read from remote repository`):
+
+1. Extract the HTTPS URL from the remote SSH URL:
+   - `git@github.com:owner/repo.git` → `https://github.com/owner/repo.git`
+   - Use `git remote get-url origin` to get the current URL
+
+2. Check HTTPS connectivity before attempting fallback:
+   ```bash
+   curl -s -o /dev/null -w "%{http_code}" --connect-timeout 10 https://github.com
+   ```
+   If returns 2xx → HTTPS reachable, proceed with fallback.
+
+3. Retry push via HTTPS:
+   ```bash
+   git push https://github.com/owner/repo.git <current-branch>
+   ```
+
+4. If HTTPS push also fails → report error and stop.
+
+**Do NOT** permanently change the remote URL — use the HTTPS URL inline so the SSH remote config is preserved.
+
 ### Batch Mode (default)
 
-After all commits (and successful pull):
-```bash
-git push
-```
+After all commits (and successful pull), execute push with SSH → HTTPS fallback as described above.
 
 ### Per-Commit Mode (-per)
 
-After each individual commit (and successful pull before each push):
-```bash
-git push
-```
+After each individual commit (and successful pull before each push), execute push with SSH → HTTPS fallback as described above.
 
 ## Step 9: Report Result
 
@@ -230,6 +252,6 @@ git push
 ## Safety Rules
 
 - **Merge/rebase in progress?** Abort with warning
-- **Push fails?** Show error, suggest `git pull --rebase`
+- **Push fails?** If SSH timeout → auto-fallback to HTTPS push. If HTTPS also fails → show error, suggest `git pull --rebase`
 - **Never force push** (`--force` or `-f`)
 - **Conflicts detected?** Stop and ask user to resolve, do NOT auto-resolve
