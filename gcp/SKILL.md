@@ -33,9 +33,31 @@ git log --oneline -5
 
 If working tree is clean, skip to Step 7 (Pull + Push) — no commits needed, but still sync with remote.
 
+### ⚠️ Git Diff Syntax Rule
+
+When using `git diff` with **both options and paths**, options MUST come before paths, or use `--` separator:
+
+```bash
+# ✅ Correct
+git diff --stat -- src/game_theory/
+git diff --name-only -- src/routing/
+git diff -- src/valuation/
+
+# ❌ Wrong — options after path cause fatal error
+git diff src/game_theory/ --stat        # fatal: --stat must come before non-option arguments
+git diff src/routing/ --name-only       # same error
+```
+
+**Rule**: always place flags/options before paths, or use `--` to explicitly separate:
+```
+git diff [<options>] [--] [<path>...]
+```
+
 ## Step 2: Group Files by Feature
 
-Analyze the changed files and group them by **feature/theme** using these heuristics:
+Analyze the changed files and group them by **feature/theme** using these heuristics.
+
+When inspecting specific directories, always use `git diff --stat -- <dir>/` (options before `--`):
 
 1. **Same directory** → likely same feature
 2. **Same file prefix** (e.g., `quiz_result_screen.dart`, `quiz_question_screen.dart`) → same feature
@@ -88,12 +110,31 @@ Before writing commit messages, review the recent conversation history (up to th
 
 ## Step 6: Commit Each Group
 
+### Pre-Flight Check (MANDATORY)
+
+Before `git add`, verify every file path:
+
+```bash
+# Check files exist AND are inside the git repo
+git ls-files --error-unmatch <file1> <file2> ... 2>&1
+# OR
+ls <file1> <file2> ... 2>&1
+```
+
+**If any file is missing or outside the repo:**
+- Remove it from the group immediately
+- If the group becomes empty, skip it
+- Common causes: file is outside repo (`~/.claude/`, `/tmp/`), wrong path, wrong case (`skill.md` vs `SKILL.md`)
+- Never blindly `git add` a path that doesn't exist — `git add` will error and the subsequent `git commit` will either fail or commit nothing
+
 For each group, run:
 
 ```bash
 git add <files_in_group>
 git commit -m "<type>: <description>"
 ```
+
+**If `git add` fails** (non-zero exit): stop, report the failing paths, do NOT proceed to commit.
 
 ### Commit Message Rules
 
