@@ -109,20 +109,38 @@ get_design_context(nodeId, fileKey) → 解析所有子节点
 
 按从上到下顺序，逐个模块记录。以下为示例格式（括弧内为 Figma 提取值，实际项目会不同）：
 
-| # | 模块描述 | Figma top | 设计尺寸 | 内容类型 | 策略 | 说明 |
-|---|---------|-----------|---------|---------|------|------|
-| 0 | `<badge>` | 53 | 292×27 | 复杂SVG装饰+文字 | **A** | 导出3x整图 |
-| 1 | `<hero_banner>` | 76 | 343×112 | 合成图(底图+叠加文字) | **A** | 导出3x整图 |
-| 2 | `<subtitle_text>` | 195 | 359×28 | 纯文字 | **B** | Text.rich |
-| 3 | `<description_text>` | 235 | 356×51 | 纯文字 | **B** | Text |
-| 4 | `<tag_row>` | 305 | 345×25 | 图标+文字标签 | **A** | 导出3x整图 |
-| 5 | `<feature_cards>` | 341 | 334×226 | 复杂卡片组 | **A** | 导出3x整图 |
-| 6 | `<expect_section>` | 569 | 355×159 | 底图+内置文字 | **A** | 导出3x整图 |
-| 7 | `<cta_button>` | 814 | 343×48 | 与项目主按钮同构 | **C** | 复用 XxxButton + 文案/渐变变体 |
-| 8 | `<bottom_hint>` | 875 | 342×17 | 纯文字 | **B** | Text |
-| 9 | `<back_button>` | — | — | 导航返回 | **C** | 复用项目返回控件 |
+| # | 模块描述 | Figma top | 设计尺寸 | 复杂度 | 策略 | 说明 |
+|---|---------|-----------|---------|--------|------|------|
+| 0 | `<badge>` | 53 | 292×27 | 简单 | **A** | 导出3x整图 |
+| 1 | `<hero_banner>` | 76 | 343×112 | 简单 | **A** | 导出3x整图 |
+| 2 | `<subtitle_text>` | 195 | 359×28 | 简单 | **B** | Text.rich（1 agent） |
+| 3 | `<description_text>` | 235 | 356×51 | 简单 | **B** | Text（1 agent） |
+| 4 | `<tag_row>` | 305 | 345×25 | 简单 | **A** | 导出3x整图 |
+| 5 | `<feature_cards>` | 341 | 334×226 | **复杂** | **A** | 导出3x整图（≥3张独立卡片） |
+| 6 | `<expect_section>` | 569 | 355×159 | 简单 | **A** | 导出3x整图 |
+| 7 | `<cta_button>` | 814 | 343×48 | 简单 | **C** | 复用 XxxButton + 文案/渐变变体（1 agent） |
+| 8 | `<bottom_hint>` | 875 | 342×17 | 简单 | **B** | Text（1 agent） |
+| 9 | `<back_button>` | — | — | 简单 | **C** | 复用项目返回控件（1 agent） |
 
 每个模块还记录与上一模块的间距（`下一模块.top - (上一模块.top + 上一模块.height)`），用于后续 `SizedBox` 取值。
+
+### A2b: 复杂度判定与拆分规则
+
+**复杂度定义**（影响 E 阶段并行分派粒度）：
+
+| 级别 | 条件 | Builder 策略 |
+|------|------|-------------|
+| 简单 | 单组件无子结构（1 个 Text / 1 个 Button / 1 张图） | **1 个 agent** |
+| 中等 | 1-2 个子组件，结构明确 | **1 个 agent**，spec 内容 ≤ ~150 行 |
+| 复杂 | ≥3 个独立子组件，各有独特样式/状态 | **拆分为 N 个 agent**：每个子组件独立 builder + 1 个 wrapper builder |
+
+**拆分示例**：`<feature_cards>` 包含 3 种卡片变体（每种有独特 hover 态和布局）→ 拆为：
+- `feature_cards/card_variant_a` — builder agent 1
+- `feature_cards/card_variant_b` — builder agent 2  
+- `feature_cards/card_variant_c` — builder agent 3
+- `feature_cards/wrapper` — builder agent 4（import 前 3 个 + 组装布局）
+
+**判定原则**：When in doubt, make it smaller。宁可多拆，不要让一个 agent 处理过于复杂的模块。
 
 ### A3: 策略判定规则
 
@@ -173,6 +191,17 @@ get_design_context(nodeId, fileKey) → 解析所有子节点
       "gap_to_next": 12
     },
     {
+      "id": "subtitle_text",
+      "type": "text",
+      "strategy": "B",
+      "source_bbox": { "x": 16, "y": 195, "width": 359, "height": 28 },
+      "scaled_bbox": { "x": 16, "y": 195, "width": 359, "height": 28 },
+      "z_index": 5,
+      "spec_file": "docs/research/modules/subtitle_text.spec.md",
+      "figma_node_id": "123:567",
+      "gap_to_next": 7
+    },
+    {
       "id": "cta_button",
       "type": "component",
       "strategy": "C",
@@ -180,6 +209,7 @@ get_design_context(nodeId, fileKey) → 解析所有子节点
       "scaled_bbox": { "x": 24, "y": 814, "width": 343, "height": 48 },
       "z_index": 20,
       "reuse": "XxxPrimaryButton",
+      "spec_file": "docs/research/modules/cta_button.spec.md",
       "figma_node_id": "123:789",
       "gap_to_next": 8
     }
@@ -192,6 +222,7 @@ get_design_context(nodeId, fileKey) → 解析所有子节点
 - `gap_to_next` 记录与下一模块的垂直间距
 - `strategy` 必须通过 A3 判定规则分配（`A` | `B` | `C`）
 - 策略 C 建议写 `reuse` 字段标明复用组件名/路径
+- 策略 B / C 的模块**必须**在 E2 阶段写 `spec_file` 并在 manifest 中记录路径
 - 统一使用 BubbleUniverseSkills [manifest 规范](../references/manifest-spec.md)
 
 ### A5: 预览模块边界
@@ -245,24 +276,294 @@ scripts/audit_assets.py assets/ \
 
 ---
 
-## E: Execution — 页面构建
+## E: Execution — 构建阶段（Extract → Spec → Dispatch → Merge → Assemble）
 
-### E1: 搭建页面框架
+**核心原则**：不是一次性写完全部代码，而是 **逐模块提取 → 写 Spec → 并行分派 Builder → Merge → 组装**。提取和构建可以并行进行——你在提取下一个模块的同时，builder agent 已经在 worktree 中构建上一个模块。
 
-按项目框架创建页面组件。通用结构（StatefulWidget + Column + Expanded，以 Flutter 为例，其他框架同理）：
+### Guiding Principles（E 阶段专用）
+
+这些原则区分成功的复刻和「差不多」的半成品：
+
+**1. 完整性优先于速度**：每个 builder 必须收到完成工作所需的所有信息——截图、精确 Figma 值、资源路径、真实文本内容、组件结构。如果 builder 需要猜测任何值（颜色/字号/间距），提取就不完整。
+
+**2. 小任务，精结果**：让一个 agent「构建整个 features 区域」→ 它会敷衍间距、猜测字号。给它一个聚焦的单组件 + 完整 CSS 规格 → 每次都精准。复杂模块应拆分。
+
+**3. Spec 文件是唯一真相源**：每个策略 B/C 模块必须在分派 builder 之前写 spec 文件。Spec 是提取工作与 builder 之间的契约。builder 收到 spec 内容内联在 prompt 中——不是「去看 DESIGN_TOKENS.md」，而是零外部引用。
+
+**4. 先提取外观，再提取行为**：组件不只是静态截图——它有 variant（hover/pressed/disabled/selected）、有 transition、有响应式变化。从 Figma `get_design_context` 中提取所有 variant 的样式差异。
+
+**5. 构建必须始终可编译**：每个 builder 完成后验证 typecheck/lint。每次 merge 后验证完整 build。不允许任何时刻构建是坏的，即使是临时性的。
+
+### E0: 创建 Spec 目录
+
+```bash
+mkdir -p docs/research/modules
+```
+
+---
+
+### E1: 逐模块提取 + 写 Spec（Extract & Spec）
+
+这是核心循环的一部分。对分析表中每个策略 **B** / **C** 模块（策略 A 不需要 spec——整图导出已在 I 阶段完成）：
+
+#### Step 1: 提取完整 Figma 样式
+
+从 `get_design_context` 返回的设计数据中，为该模块提取所有视觉属性：
+
+```javascript
+// 对目标 Figma 节点运行 get_design_context，提取以下信息：
+// - 字体：fontFamily, fontSize, fontWeight, lineHeight, letterSpacing
+// - 颜色：fills/strokes 中的色值（含透明度）
+// - 布局：padding, gap, alignment, constraints
+// - 装饰：borderRadius, boxShadow, backdropFilter, gradient
+// - Variant：所有交互状态的样式差异（hover/pressed/disabled/selected）
+// - 内容：所有文本节点的实际文字
+// - 资源：该模块引用的图片/SVG 节点
+```
+
+**规则**：
+- 每个值必须从 Figma context 中精确提取，不用「看起来像 16px」这种近似
+- 如果有 variant（组件变体），提取所有 variant 的完整样式
+- 截图保存到 `docs/design-references/<module-id>.png`，供 builder 视觉对照
+
+#### Step 2: 写模块 Spec 文件
+
+**文件路径**：`docs/research/modules/<module-id>.spec.md`
+
+**模板**：
+
+```markdown
+# <ModuleName> 模块规格
+
+## 基本信息
+- **目标文件**: `src/components/<ModuleName>.tsx`（或项目对应路径）
+- **策略**: B（原生渲染）| C（复用 `<ComponentName>`）
+- **Figma 节点**: `123:456`
+- **截图**: `docs/design-references/<module-id>.png`
+- **复杂度**: 简单 | 中等 | 复杂（≥3 子组件）
+
+## 层级结构
+<!-- 描述 DOM / Widget 层级：什么包含什么 -->
+- Container (maxWidth: 343, padding: 16)
+  - Text (标题)
+  - Row (标签组)
+    - Chip × 3
+
+## Figma 精确样式（来自 get_design_context）
+
+### Container
+- backgroundColor: #FFFFFF
+- borderRadius: 12px
+- padding: 16px 20px
+- boxShadow: 0px 2px 8px rgba(0,0,0,0.08)
+
+### 标题 Text
+- fontFamily: "PingFang SC"
+- fontSize: 18px
+- fontWeight: 600
+- color: #1A1A1A
+- lineHeight: 1.4 (25.2px)
+- letterSpacing: 0
+
+### 标签 Chip（×3）
+- backgroundColor: #F5F0FF
+- borderRadius: 20px
+- padding: 4px 12px
+- fontSize: 12px
+- color: #7C5CFC
+
+### 间距
+- 标题 → 标签组：12px gap
+- 标签之间：8px gap
+
+## Variant / 交互状态
+
+### 标签 Chip — hover 态（如有）
+- backgroundColor: #F5F0FF → #EDE3FF
+- transition: 200ms ease
+
+### 标签 Chip — selected 态（如有）
+- backgroundColor: #7C5CFC, color: #FFFFFF
+
+## 文本内容（逐字）
+- 标题: "立即加入，开启你的专属体验"
+- 标签1: "免费试用"
+- 标签2: "随时退出"
+- 标签3: "专业指导"
+
+## 响应式行为
+- **Desktop**: 水平排列，maxWidth 600px 居中
+- **Mobile**: 同上（该模块尺寸小，不需换行）
+
+## 资源引用
+- 图标: 无（纯文本+背景）
+- 图片: 无
+
+## 复用组件（仅策略 C）
+- **复用**: `XxxPrimaryButton`（路径: `src/components/buttons/`）
+- **覆盖参数**: label=稿面文案, gradient=稿面渐变色
+- **无需覆盖**: borderRadius 用主题默认, onPressed 连现有客服跳转
+```
+
+**填写要求**：
+- 每个字段必须填。不适用则写「N/A」而非跳过
+- Variant 部分如果 Figma 组件确有 variant，必须逐个写全
+- 文本内容必须从 Figma 逐字复制，不要意译
+
+#### Step 3: 更新 Manifest
+
+在 `layers.manifest.json` 对应层中填写 `spec_file` 路径：
+
+```json
+{ "id": "tag_row", "strategy": "B", "spec_file": "docs/research/modules/tag_row.spec.md" }
+```
+
+---
+
+### E2: 预分派检查清单（Pre-Dispatch Checklist）
+
+每分派一个 builder agent 之前，必须逐项确认。**有一条不满足就不能分派**：
+
+- [ ] Spec 文件已写入 `docs/research/modules/<name>.spec.md`，所有字段已填
+- [ ] 每个 CSS 值来自 Figma `get_design_context`，非目测估算
+- [ ] 策略 C 模块的复用组件已在项目中确认存在（grep 验证）
+- [ ] 交互状态（variant）已提取（如 Figma 组件有 variant）
+- [ ] 截图已保存到 `docs/design-references/` 供 builder 对照
+- [ ] Builder prompt 内容控制在合理规模（spec 内容 ≤ ~150 行；超过则表明需拆分模块）
+- [ ] 文本内容逐字来自 Figma，非意译
+- [ ] 模块间依赖已明确（如 wrapper 需等子组件先完成）
+
+---
+
+### E3: 并行分派 Builder（Dispatch）
+
+#### 分派策略
+
+按 A2b 复杂度判定：
+
+| 复杂度 | 做法 |
+|--------|------|
+| 简单 | 1 个 agent 构建整个模块 |
+| 中等 | 1 个 agent，spec 内联 |
+| 复杂 | **拆分**：N 个子组件各 1 个 agent + 1 个 wrapper agent |
+
+**并行原则**：所有独立模块的 builder agent 可以同时分派（使用 git worktree 隔离）。O orchestrator 分派后继续提取下一个模块，不等待 builder 完成。
+
+**依赖排序**：wrapper 必须等其子组件 builder 全部完成后再分派。独立的兄弟模块无此限制。
+
+#### Builder Agent Prompt 模板
+
+每个 builder agent 收到以下内容的 prompt：
+
+```
+## 任务：构建 <ModuleName>
+
+## Spec 文件
+[在此内联 docs/research/modules/<module-id>.spec.md 的完整内容]
+
+## 设计截图
+截图路径：docs/design-references/<module-id>.png
+（请参考截图进行视觉对照）
+
+## 共享资源
+- 主题/Token 文件：<项目主题文件路径>
+- 复用组件：<列表，含文件路径和构造参数>
+- 工具函数：<cn() / 项目 utils 路径>
+
+## 目标文件
+src/components/<ModuleName>.tsx（或项目对应路径+扩展名）
+
+## 要求
+1. **严格按 Spec 中的 Figma 值实现**——不要近似，不要「看起来差不多」
+2. **策略 C 优先复用**：如果 Spec 标记了 reuse 组件，import 它而非新建平行实现
+3. **偏离必须注释**：因设计系统/无障碍等原因故意偏离 Figma 时，必须加注释：
+   // 偏离 Figma: <改了什么>；原因: <为什么>；稿面值: <原值>
+4. **完成后验证**：运行项目 typecheck/lint 确保无错误
+5. 在独立 worktree 中工作，完成后通知 merge
+```
+
+#### Worktree 隔离
+
+```bash
+# Orchestrator 为每个 builder agent 创建独立 worktree
+git worktree add .claude/worktrees/<module-name> -b build/<module-name>
+# Builder agent 在该 worktree 中工作
+# 完成后 Orchestrator merge 回主分支
+```
+
+---
+
+### E4: Merge + 验证（Merge & Verify）
+
+Builder agent 完成构建后：
+
+1. **Merge worktree**：
+   ```bash
+   git merge build/<module-name> --no-ff -m "feat: add <ModuleName> component"
+   git worktree remove .claude/worktrees/<module-name>
+   ```
+2. **验证构建**：
+   ```bash
+   flutter analyze   # 或项目对应的 typecheck/lint 命令
+   ```
+3. **冲突处理**：O orchestrator 有所有模块的完整上下文，智能解决冲突
+4. **不等待全部完成**：Merge 一个 builder 的结果后，立即继续当前提取循环。Builder 间并行工作
+
+**规则**：一次 merge 后构建是坏的 → 立即修复 → 再继续。不要积累多个未验证的 merge。
+
+---
+
+### E5: 页面组装（Page Assembly）
+
+所有模块 builder 完成 + merge 后，在页面入口文件中统一接入：
+
+1. **导入所有 section 组件**
+2. **按分析表从上到下排列**，间距使用 manifest 中的 `gap_to_next` 值
+3. **策略 A 模块**：直接引用已导入的图片资源（I 阶段完成）
+4. **实现页面级行为**：scroll controller、sticky 元素、z-index 层级
+5. **CTA / 交互按钮**（参照 E6）
+6. **验证**：完整 build 通过
 
 ```dart
-// 1. 从 Figma get_design_context 提取页面背景色
-// 2. 按分析表从上到下排列各 section（CTA 按钮除外）
-// 3. 间距使用分析表中计算出的 gap 值
-// 4. 底部 CTA 参照 E6 默认模式实现（常驻 + 滚动自适应阴影）
-// 5. 返回按钮浮动在 ScrollView 之上（优先策略 C 复用项目返回）
-class XxxLandingPage extends StatefulWidget {
-  static void navigate(BuildContext context) { /* push route */ }
-  @override
-  State<XxxLandingPage> createState() => _XxxLandingPageState();
-}
+// 页面组装示例（Flutter，其他框架同理）
+Scaffold(
+  backgroundColor: /* Figma 页面背景色 */,
+  body: Column(children: [
+    Expanded(child: Stack(children: [
+      SingleChildScrollView(
+        controller: _scrollController,
+        child: Column(children: [
+          // 策略 A: 图片
+          _buildImageSection('assets/badge_3x.png', 0),
+          SizedBox(height: 12),   // gap_to_next 来自 manifest
+          _buildImageSection('assets/hero_banner_3x.png', 12),
+          SizedBox(height: 7),
+          // 策略 B: Widget（builder agent 产出）
+          SubtitleText(),         // 来自 build/subtitle_text worktree
+          SizedBox(height: 7),
+          DescriptionText(),
+          SizedBox(height: 13),
+          // 策略 C: 复用组件（builder agent 产出）
+          TagRow(),
+          // ...
+        ]),
+      ),
+      Positioned(top: 48, left: 16, child: _buildBackButton()),
+    ])),
+    BottomBar(...),  // 参照 E6
+  ]),
+);
+```
 
+---
+
+### E6: 底部常驻 CTA（滚动自适应阴影）
+
+**适用场景**：活动页底部 CTA 按钮需要始终可见，滑到底部时自然融入。
+
+**默认实现模式**（Flutter 示例，其他框架同理）：
+
+```dart
 class _XxxLandingPageState extends State<XxxLandingPage> {
   final ScrollController _scrollController = ScrollController();
   bool _isNearBottom = false;
@@ -272,97 +573,45 @@ class _XxxLandingPageState extends State<XxxLandingPage> {
   @override
   void dispose() { _scrollController.dispose(); super.dispose(); }
 
-  void _onScroll() { /* 参照 E6 */ }
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    final nearBottom = maxScroll - currentScroll < 16;
+    if (nearBottom != _isNearBottom) setState(() => _isNearBottom = nearBottom);
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: /* Figma 页面背景色 */,
-      body: Column(children: [
-        Expanded(child: Stack(children: [
-          SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(children: [
-              _section0(), SizedBox(height: _gap0_1),  // 按分析表
-              _section1(), SizedBox(height: _gap1_2),
-              // ...
-            ]),
-          ),
-          _buildBackButton(context),
-        ])),
-        _buildBottomBar(context),  // 参照 E6
+  Widget _buildBottomBar(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      decoration: BoxDecoration(
+        color: /* 页面背景色 */,
+        boxShadow: _isNearBottom
+            ? []
+            : [BoxShadow(color: Color(0x1A000000), blurRadius: 8, offset: Offset(0, -2))],
+      ),
+      padding: EdgeInsets.only(bottom: bottomPadding),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const SizedBox(height: 16),
+        // CTA 按钮...
+        const SizedBox(height: 8),
+        // 底部提示文字...
+        const SizedBox(height: 16),
       ]),
     );
   }
 }
 ```
 
-### E2: 策略 A 模块 → 图片组件
+**状态说明**：
+- `_isNearBottom = false` → 阴影可见（常驻态）
+- `_isNearBottom = true` → 阴影消失（融入态）
+- `AnimatedContainer` 200ms 过渡
 
-```dart
-Widget _buildImageSection(String assetPath, double borderRadius) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: /* Figma 边距 */),
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: Image.asset(assetPath, width: double.infinity, fit: BoxFit.fitWidth),
-    ),
-  );
-}
-```
+---
 
-### E3: 策略 B 模块 → 原生 Widget
-
-字体、颜色、字号、字重均从 `get_design_context` 返回的 Figma 规格中提取：
-
-```dart
-// 纯文本示例
-Text(
-  /* Figma 文本内容 */,
-  style: TextStyle(
-    fontFamily: /* 从 Figma font-family 提取 */,
-    fontSize: /* Figma font-size */,
-    fontWeight: /* Figma font-weight */,
-    color: /* Figma color */,
-    height: /* Figma line-height / font-size */,
-  ),
-  textAlign: TextAlign.center,
-);
-
-// 渐变按钮示例（仅当策略 C 找不到对等组件时使用）
-Container(
-  decoration: BoxDecoration(
-    gradient: LinearGradient(
-      colors: [/* Figma gradient start */, /* Figma gradient end */],
-    ),
-    borderRadius: BorderRadius.circular(/* Figma border-radius */),
-  ),
-  child: Text(/* Figma 按钮文字 */),
-);
-```
-
-### E3b: 策略 C 模块 → 复用项目组件
-
-**原则**：Figma MCP 输出是规格与行为参考，不是最终代码风格。优先 extend 现有组件。
-
-```dart
-// 示例：复用项目主按钮，仅覆盖稿面要求的文案/颜色
-// 偏离 Figma: 圆角用主题 radiusMd(12) 而非稿 10，保持设计系统一致
-XxxPrimaryButton(
-  label: /* Figma 文案 */,
-  onPressed: () { /* 复用项目已有跳转/客服逻辑，见 E5 */ },
-  // 仅在项目 API 支持时覆盖颜色/尺寸；不要复制一份平行 Button 实现
-);
-```
-
-执行清单：
-1. import 项目组件，不新建同名平行 Widget
-2. 能走主题/token 的颜色与字号，走 token；不要无必要 hardcode
-3. 参数不够表达稿面差异 → 优先给现有组件加变体/参数，其次才本地小包装
-4. 行为（跳转、埋点、权限）对齐项目现有页面，不要只抄视觉
-5. manifest 中 `strategy: "C"` 的层应对应到具体 `reuse` 组件
-
-### E4: 设计标记映射
+### E7: 设计标记映射
 
 | Figma 属性 | 代码映射 |
 |-----------|---------|
@@ -373,12 +622,11 @@ XxxPrimaryButton(
 | `gap: 12px` | `SizedBox(height: 12)` |
 | `line-height / font-size` | `height: <比值>` |
 
-> 字体、具体色值均从 `get_design_context` 返回的 Figma 声明中提取，不同项目不同设计稿都会变化。  
-> **策略 C**：稿面值与项目 token 冲突时，优先 token；若必须贴稿，按 E4b 写偏离注释。
+> 字体、具体色值均从 `get_design_context` 返回的 Figma 声明中提取。**策略 C**：稿面值与项目 token 冲突时，优先 token；若必须贴稿，按 E7b 写偏离注释。
 
-### E4b: 偏离文档化（必须）
+### E7b: 偏离文档化（必须）
 
-因设计系统、无障碍、安全区、SDK 限制等**故意偏离 Figma** 时，必须在代码旁注释，格式：
+因设计系统、无障碍、安全区、SDK 限制等**故意偏离 Figma** 时，必须在代码旁注释：
 
 ```dart
 // 偏离 Figma: <改了什么>；原因: <为什么>；稿面值: <原值>
@@ -386,121 +634,19 @@ XxxPrimaryButton(
 // 偏离 Figma: 圆角 10→12；原因: 使用主题 radiusMd；稿面值: 10
 ```
 
-规则：
 - 注释写在偏离发生的那一行或紧邻上方
-- 分析表 / manifest 备注可同步记一笔（可选，复杂页推荐）
-- 禁止静默偏离：改了却不写，后续验收会被当成 bug 改回去
+- 禁止静默偏离：改了却不写，后续验收会被当成 bug
 
-### E5: CTA / 交互按钮
+### E8: CTA / 交互按钮
 
-**复用项目中已有的模式**（策略 C），不要凭空实现。查找方法：
-1. 搜索项目代码中现有的「联系我们」「客服」「分享」「跳转」等功能的实现
+**复用项目中已有的模式**（策略 C），不要凭空实现：
+1. 搜索项目中「联系我们」「客服」「分享」「跳转」等功能的实现
 2. 找到对应的 Service/Manager 或页面跳转逻辑
 3. 直接引用，保持行为一致
 
-### E6: 底部常驻CTA（滚动自适应阴影）
+### E9: 构建与部署
 
-**适用场景**：活动页底部 CTA 按钮（如「立即加入」「立即参与」）需要始终可见，且滑到底部时自然融入。
-
-**默认实现模式**：
-
-```dart
-class XxxLandingPage extends StatefulWidget {                    // 必须是 StatefulWidget
-  const XxxLandingPage({Key? key}) : super(key: key);
-
-  @override
-  State<XxxLandingPage> createState() => _XxxLandingPageState();
-}
-
-class _XxxLandingPageState extends State<XxxLandingPage> {
-  final ScrollController _scrollController = ScrollController();
-  bool _isNearBottom = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (!_scrollController.hasClients) return;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.position.pixels;
-    final nearBottom = maxScroll - currentScroll < 16;          // 距底部 16px 触发
-    if (nearBottom != _isNearBottom) {
-      setState(() => _isNearBottom = nearBottom);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: /* 页面背景色 */,
-      body: Column(                                               // Column + Expanded 布局
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                SingleChildScrollView(
-                  controller: _scrollController,                  // 传入 controller
-                  child: Column(children: [
-                    // ... 所有内容模块（不含底部CTA）...
-                    const SizedBox(height: 24),
-                  ]),
-                ),
-                _buildBackButton(context),                        // Positioned 返回按钮
-              ],
-            ),
-          ),
-          _buildBottomBar(context),                               // 底部栏在 Column 最下
-        ],
-      ),
-    );
-  }
-}
-```
-
-**`_buildBottomBar` 实现**（带 `AnimatedContainer` 平滑过渡阴影）：
-
-```dart
-Widget _buildBottomBar(BuildContext context) {
-  final bottomPadding = MediaQuery.of(context).padding.bottom;
-  return AnimatedContainer(                                       // 200ms 平滑过渡
-    duration: const Duration(milliseconds: 200),
-    decoration: BoxDecoration(
-      color: /* 页面背景色 */,
-      boxShadow: _isNearBottom                                    // 距底部 16px 内无阴影
-          ? []
-          : [BoxShadow(color: Color(0x1A000000), blurRadius: 8, offset: Offset(0, -2))],
-    ),
-    padding: EdgeInsets.only(bottom: bottomPadding),              // 适配安全区
-    child: Column(mainAxisSize: MainAxisSize.min, children: [
-      const SizedBox(height: 16),
-      // CTA 按钮...
-      const SizedBox(height: 8),
-      // 底部提示文字...
-      const SizedBox(height: 16),
-    ]),
-  );
-}
-```
-
-**状态说明**：
-- `_isNearBottom = false` → 阴影可见，按钮与内容区视觉分离（常驻态）
-- `_isNearBottom = true` → 阴影消失，按钮自然融入页面（融入态）
-- `AnimatedContainer` 保证两种状态间的 200ms 过渡丝滑流畅
-- 阈值 `16px` 适用于大部分页面内容高度，可根据实际微调
-
-### E7: 构建与部署
-
-根据项目类型选择构建命令，原则：
-- 资源文件新增/替换 → 需要完整 rebuild
+- 资源文件新增/替换 → 完整 rebuild
 - 仅代码变更 → 热重载即可
 
 ---
@@ -528,7 +674,7 @@ Widget _buildBottomBar(BuildContext context) {
 
 ### V1: 模块对照
 
-拿出 **A2 分析表** / `layers.manifest.json`，在设备上逐模块对照：位置、尺寸、清晰度、样式是否与设计一致。  
+拿出 **A2 分析表** / `layers.manifest.json` / **各模块 spec 文件**，在设备上逐模块对照：位置、尺寸、清晰度、样式是否与设计一致。  
 策略 C 模块额外确认：是否真的复用了声明的组件（无平行复制实现）。
 
 ### V2: 视觉对比（量化）
@@ -571,8 +717,9 @@ scripts/preview_modules.py device-screenshot.png layers.manifest.json qa/device-
 - [ ] 所有文本用原生 Widget（策略 B）或项目排版组件（策略 C），清晰无模糊
 - [ ] 所有图片来自 3x 导出（策略 A），清晰无模糊
 - [ ] 策略 C 模块未新建平行 Button/返回等实现
-- [ ] 按钮渐变起止色与 Figma 一致（或已按 E4b 注明偏离）
+- [ ] 按钮渐变起止色与 Figma 一致（或已按 E7b 注明偏离）
 - [ ] Section 间距与分析表 / manifest gap 值对齐
+- [ ] 策略 B/C 模块实现与 spec 文件中的 Figma 精确值一致
 - [ ] 故意偏离均有 `// 偏离 Figma:` 注释
 
 ### V5: 偏离清单复核
@@ -599,7 +746,7 @@ scripts/preview_modules.py device-screenshot.png layers.manifest.json qa/device-
 | 9 | **1x 资源误用** | 策略 A 模块模糊 | 运行 `audit_assets.py --min-dimension` 检测 |
 | 10 | **模块边界不准** | 截图叠图时发现模块裁切/偏移 | 用 `preview_modules.py` 提前校验 bbox |
 | 11 | **Context 截断仍硬写** | 模块结构不全、间距乱 | P2：metadata → 分 section 再 get_design_context |
-| 12 | **忽略设计系统硬抄稿** | 平行 Button/色值泛滥 | 策略先 C 后 B；token 冲突用 E4b 注释 |
+| 12 | **忽略设计系统硬抄稿** | 平行 Button/色值泛滥 | 策略先 C 后 B；token 冲突用 E7b 注释 |
 
 ---
 
