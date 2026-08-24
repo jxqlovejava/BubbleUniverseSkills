@@ -1,0 +1,626 @@
+[
+  {
+    "cardNumber": 0,
+    "name": "愚人",
+    "englishName": "The Fool",
+    "imagePath": "assets/tarot-card/rider_waite/the_fool.webp",
+    "uprightMeaning": "冒险精神、新起点、信任直觉、无畏探索、潜能觉醒",
+    "reversedMeaning": "鲁莽冲动、逃避责任、迷失方向、盲目乐观、陷入险境"
+  },
+  {
+    "cardNumber": 1,
+    "name": "魔术师",
+    "englishName": "The Magician",
+    "imagePath": "assets/tarot-card/rider_waite/the_magician.webp",
+    "uprightMeaning": "创造力、行动力、资源整合、沟通成功、显化潜能",
+    "reversedMeaning": "欺骗操纵、精力错用、计划失败、资源匮乏、能力不足"
+  },
+  {
+    "cardNumber": 2,
+    "name": "女祭司",
+    "englishName": "The High Priestess",
+    "imagePath": "assets/tarot-card/rider_waite/the_high_priestess.webp",
+    "uprightMeaning": "直觉洞察、隐秘智慧、等待时机、灵性觉醒、潜意识连接",
+    "reversedMeaning": "无知闭塞、情绪失控、拒绝内省、秘密暴露、直觉失灵"
+  },
+  {
+    "cardNumber": 3,
+    "name": "皇后",
+    "englishName": "The Empress",
+    "imagePath": "assets/tarot-card/rider_waite/the_empress.webp",
+    "uprightMeaning": "丰盛富足、母性滋养、创造力迸发、自然和谐、感官愉悦",
+    "reversedMeaning": "依赖成瘾、创造力受阻、物质匮乏、过度纵欲、情感窒息"
+  },
+  {
+    "cardNumber": 4,
+    "name": "皇帝",
+    "englishName": "The Emperor",
+    "imagePath": "assets/tarot-card/rider_waite/the_emperor.webp",
+    "uprightMeaning": "权威掌控、秩序建立、领导魄力、目标达成、结构稳固",
+    "reversedMeaning": "专制暴政、控制欲过强、优柔寡断、规则僵化、根基动摇"
+  },
+  {
+    "cardNumber": 5,
+    "name": "教皇",
+    "englishName": "The Hierophant",
+    "imagePath": "assets/tarot-card/rider_waite/the_hierophant.webp",
+    "uprightMeaning": "传统继承、道德指引、精神信仰、群体认同、仪式整合",
+    "reversedMeaning": "教条主义、盲从权威、信仰迷失、道德绑架、灵性空洞"
+  },
+  {
+    "cardNumber": 6,
+    "name": "恋人",
+    "englishName": "The Lovers",
+    "imagePath": "assets/tarot-card/rider_waite/the_lovers_fix.webp",
+    "uprightMeaning": "爱情选择、关系和谐、灵魂共鸣、价值观契合、身心合一",
+    "reversedMeaning": "情感冲突、责任逃避、信任破裂、选择困难、失衡对立"
+  },
+  {
+    "cardNumber": 7,
+    "name": "战车",
+    "englishName": "The Chariot",
+    "imagePath": "assets/tarot-card/rider_waite/the_chariot.webp",
+    "uprightMeaning": "意志胜利、方向掌控、快速推进、自我约束、目标征服",
+    "reversedMeaning": "失控翻覆、鲁莽冲突、方向迷失、动力不足、内外失衡"
+  },
+  {
+    "cardNumber": 8,
+    "name": "力量",
+    "englishName": "Strength",
+    "imagePath": "assets/tarot-card/rider_waite/strength.webp",
+    "uprightMeaning": "内在勇气、以柔克刚、情绪平衡、坚韧耐心、驯服本能",
+    "reversedMeaning": "自我怀疑、情绪压抑、冲动暴力、力量滥用、意志溃散"
+  },
+  {
+    "cardNumber": 9,
+    "name": "隐士",
+    "englishName": "The Hermit",
+    "imagePath": "assets/tarot-card/rider_waite/the_hermit.webp",
+    "uprightMeaning": "内省反思、真理探索、孤独指引、智慧沉淀、灵性启蒙",
+    "reversedMeaning": "孤立逃避、拒绝建议、方向迷失、过度保守、知识傲慢"
+  },
+  {
+    "cardNumber": 10,
+    "name": "命运之轮",
+    "englishName": "The Wheel of Fortune",
+    "imagePath": "assets/tarot-card/rider_waite/the_wheel_of_fortune.webp",
+    "uprightMeaning": "命运转折、机遇降临、因果循环、顺应变化、新周期",
+    "reversedMeaning": "抗拒改变、厄运循环、失控动荡、外力阻碍、错失良机"
+  },
+  {
+    "cardNumber": 11,
+    "name": "正义",
+    "englishName": "Justice",
+    "imagePath": "assets/tarot-card/rider_waite/justice.webp",
+    "uprightMeaning": "公平裁决、责任担当、因果平衡、法律公正、道德清醒",
+    "reversedMeaning": "偏见不公、逃避责任、法律纠纷、失衡报复、优柔寡断"
+  },
+  {
+    "cardNumber": 12,
+    "name": "倒吊人",
+    "englishName": "The Hanged Man",
+    "imagePath": "assets/tarot-card/rider_waite/the_hanged_man.webp",
+    "uprightMeaning": "牺牲换觉醒、视角转换、等待顿悟、灵性成长、放下执念",
+    "reversedMeaning": "无谓牺牲、功利主义、思维僵化、被迫妥协、精神困局"
+  },
+  {
+    "cardNumber": 13,
+    "name": "死神",
+    "englishName": "Death",
+    "imagePath": "assets/tarot-card/rider_waite/death.webp",
+    "uprightMeaning": "结束重生、彻底蜕变、放手释怀、断舍离、能量更新",
+    "reversedMeaning": "抗拒改变、恐惧新生、虚假终结、停滞腐朽、执念缠身"
+  },
+  {
+    "cardNumber": 14,
+    "name": "节制",
+    "englishName": "Temperance",
+    "imagePath": "assets/tarot-card/rider_waite/temperance.webp",
+    "uprightMeaning": "调和平衡、耐心磨合、资源整合、灵性融合、中庸之道",
+    "reversedMeaning": "能量失衡、急躁冒进、资源浪费、内在冲突、适应不良"
+  },
+  {
+    "cardNumber": 15,
+    "name": "恶魔",
+    "englishName": "The Devil",
+    "imagePath": "assets/tarot-card/rider_waite/the_devil_fix.webp",
+    "uprightMeaning": "欲望沉溺、物质束缚、心魔操控、贪婪成瘾、自我设限",
+    "reversedMeaning": "挣脱枷锁、直面阴影、欲望转化、灵性觉醒、重获自由"
+  },
+  {
+    "cardNumber": 16,
+    "name": "高塔",
+    "englishName": "The Tower",
+    "imagePath": "assets/tarot-card/rider_waite/the_tower.webp",
+    "uprightMeaning": "剧变觉醒、打破幻象、真相揭露、颠覆重建、强制解放",
+    "reversedMeaning": "逃避问题、累积危机、突然崩溃、信任崩塌、灾难扩大"
+  },
+  {
+    "cardNumber": 17,
+    "name": "星星",
+    "englishName": "The Star",
+    "imagePath": "assets/tarot-card/rider_waite/the_star_fix.webp",
+    "uprightMeaning": "希望重生、灵感涌现、精神疗愈、信仰复苏、宇宙指引",
+    "reversedMeaning": "希望渺茫、灵感枯竭、信心丧失、愿景模糊、灵性枯竭"
+  },
+  {
+    "cardNumber": 18,
+    "name": "月亮",
+    "englishName": "The Moon",
+    "imagePath": "assets/tarot-card/rider_waite/the_moon.webp",
+    "uprightMeaning": "潜意识恐惧、迷惑欺骗、直觉预警、深层情绪、梦境启示",
+    "reversedMeaning": "直面恐惧、识破欺骗、厘清迷惑、情绪释放、直觉复苏"
+  },
+  {
+    "cardNumber": 19,
+    "name": "太阳",
+    "englishName": "The Sun",
+    "imagePath": "assets/tarot-card/rider_waite/the_sun_fix.webp",
+    "uprightMeaning": "成功喜悦、活力光明、纯真快乐、目标达成、积极能量",
+    "reversedMeaning": "短暂成功、过度乐观、虚假繁荣、热情消退、计划受阻"
+  },
+  {
+    "cardNumber": 20,
+    "name": "审判",
+    "englishName": "Judgement",
+    "imagePath": "assets/tarot-card/rider_waite/judgement_fix.webp",
+    "uprightMeaning": "觉醒重生、救赎解脱、因果清算、灵魂召唤、集体共鸣",
+    "reversedMeaning": "自责悔恨、拒绝觉醒、逃避责任、救赎无门、业力纠缠"
+  },
+  {
+    "cardNumber": 21,
+    "name": "世界",
+    "englishName": "The World",
+    "imagePath": "assets/tarot-card/rider_waite/the_world_fix.webp",
+    "uprightMeaning": "圆满达成、和谐循环、旅程终点、整合归属、永恒成就",
+    "reversedMeaning": "未完成、延迟成功、能量失衡、目标偏移、循环中断"
+  },
+  {
+    "cardNumber": 22,
+    "name": "权杖首牌",
+    "englishName": "Ace of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/ace_of_wands.webp",
+    "uprightMeaning": "新行动启程、热情迸发、创意萌芽、机会降临、能量激活",
+    "reversedMeaning": "延误搁置、动力不足、方向错误、计划中断、潜能压抑"
+  },
+  {
+    "cardNumber": 23,
+    "name": "权杖二",
+    "englishName": "Two of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/two_of_wands.webp",
+    "uprightMeaning": "未来规划、全局掌控、野心展望、战略布局、潜在机遇",
+    "reversedMeaning": "犹豫不决、视野狭隘、目标错位、保守退缩、决策失误"
+  },
+  {
+    "cardNumber": 24,
+    "name": "权杖三",
+    "englishName": "Three of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/three_of_wands.webp",
+    "uprightMeaning": "远见合作、事业扩张、成果初显、跨域发展、耐心等待",
+    "reversedMeaning": "孤立无援、进展停滞、合作破裂、资源不足、预期落空"
+  },
+  {
+    "cardNumber": 25,
+    "name": "权杖四",
+    "englishName": "Four of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/four_of_wands.webp",
+    "uprightMeaning": "稳定欢庆、家庭和谐、成就庆典、归属安心、社交愉悦",
+    "reversedMeaning": "根基虚浮、虚假繁荣、联结断裂、欢愉短暂、安全感缺失"
+  },
+  {
+    "cardNumber": 26,
+    "name": "权杖五",
+    "englishName": "Five of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/five_of_wands.webp",
+    "uprightMeaning": "冲突竞争、挑战激发、观点碰撞、能量释放、突破尝试",
+    "reversedMeaning": "无谓内耗、逃避冲突、消极避战、方向混乱、精力分散"
+  },
+  {
+    "cardNumber": 27,
+    "name": "权杖六",
+    "englishName": "Six of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/six_of_wands.webp",
+    "uprightMeaning": "公众认可、胜利荣归、自信展现、领导魅力、目标达成",
+    "reversedMeaning": "虚假赞誉、嫉妒阻挠、荣誉丧失、支持流失、盛名难副"
+  },
+  {
+    "cardNumber": 28,
+    "name": "权杖七",
+    "englishName": "Seven of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/seven_of_wands.webp",
+    "uprightMeaning": "捍卫立场、抗压坚持、信念守卫、独立应对、逆境抗争",
+    "reversedMeaning": "寡不敌众、退缩妥协、立场动摇、力不从心、防御崩溃"
+  },
+  {
+    "cardNumber": 29,
+    "name": "权杖八",
+    "englishName": "Eight of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/eight_of_wands.webp",
+    "uprightMeaning": "飞速进展、信息传递、快速决策、能量畅通、时机成熟",
+    "reversedMeaning": "计划延误、沟通混乱、能量阻滞、方向偏离、意外中断"
+  },
+  {
+    "cardNumber": 30,
+    "name": "权杖九",
+    "englishName": "Nine of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/nine_of_wands.webp",
+    "uprightMeaning": "坚韧防御、经验戒备、危机警觉、毅力坚守、恢复期",
+    "reversedMeaning": "过度防御、身心俱疲、信任缺失、恐慌失控、防线溃散"
+  },
+  {
+    "cardNumber": 31,
+    "name": "权杖十",
+    "englishName": "Ten of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/ten_of_wands.webp",
+    "uprightMeaning": "责任重压、坚持负担、过度操劳、压力累积、目标执着",
+    "reversedMeaning": "不堪重负、无效努力、能量透支、逃避责任、协作缺失"
+  },
+  {
+    "cardNumber": 32,
+    "name": "圣杯首牌",
+    "englishName": "Ace of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/ace_of_cups.webp",
+    "uprightMeaning": "情感新生、直觉开启、爱意流动、灵性滋养、关系启程",
+    "reversedMeaning": "情感枯竭、拒绝接纳、滋养中断、心墙高筑、灵性匮乏"
+  },
+  {
+    "cardNumber": 33,
+    "name": "圣杯二",
+    "englishName": "Two of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/two_of_cups.webp",
+    "uprightMeaning": "平等爱恋、灵魂共鸣、契约联结、能量交融、和谐互动",
+    "reversedMeaning": "关系失衡、沟通断裂、信任崩塌、情感疏离、契约失效"
+  },
+  {
+    "cardNumber": 34,
+    "name": "圣杯三",
+    "englishName": "Three of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/three_of_cups.webp",
+    "uprightMeaning": "欢聚庆祝、友情丰收、成果共享、社交愉悦、情感联结",
+    "reversedMeaning": "乐极生悲、虚假友谊、过度放纵、冲突暗涌、联结浮夸"
+  },
+  {
+    "cardNumber": 35,
+    "name": "圣杯四",
+    "englishName": "Four of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/four_of_cups.webp",
+    "uprightMeaning": "情感倦怠、静观反思、机会忽视、内在探索、灵性觉醒",
+    "reversedMeaning": "麻木逃避、拒绝成长、封闭自我、机会错失、觉醒延迟"
+  },
+  {
+    "cardNumber": 36,
+    "name": "圣杯五",
+    "englishName": "Five of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/five_of_cups.webp",
+    "uprightMeaning": "失落悲伤、聚焦遗憾、创伤停滞、哀悼期、情感孤立",
+    "reversedMeaning": "走出伤痛、希望重生、释怀接纳、修复可能、向前迈进"
+  },
+  {
+    "cardNumber": 37,
+    "name": "圣杯六",
+    "englishName": "Six of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/six_of_cups.webp",
+    "uprightMeaning": "童年回忆、单纯赠予、情感庇护、怀旧治愈、安全感",
+    "reversedMeaning": "沉溺过去、拒绝成长、依赖成瘾、童真幻灭、过度理想化"
+  },
+  {
+    "cardNumber": 38,
+    "name": "圣杯七",
+    "englishName": "Seven of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/seven_of_cups.webp",
+    "uprightMeaning": "幻想选择、欲望迷惑、潜在可能、灵感涌现、梦境探索",
+    "reversedMeaning": "逃避现实、决策瘫痪、幻想破灭、虚假承诺、认知混乱"
+  },
+  {
+    "cardNumber": 39,
+    "name": "圣杯八",
+    "englishName": "Eight of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/eight_of_cups.webp",
+    "uprightMeaning": "舍弃追寻、灵性探索、成长蜕变、真相直面、自我超越",
+    "reversedMeaning": "盲目逃离、未解心结、方向迷失、半途而废、价值否定"
+  },
+  {
+    "cardNumber": 40,
+    "name": "圣杯九",
+    "englishName": "Nine of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/nine_of_cups.webp",
+    "uprightMeaning": "情感满足、愿望成真、自我奖赏、愉悦享受、成就感",
+    "reversedMeaning": "空虚享乐、自我欺骗、过度放纵、虚荣膨胀、满足崩塌"
+  },
+  {
+    "cardNumber": 41,
+    "name": "圣杯十",
+    "englishName": "Ten of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/ten_of_cups.webp",
+    "uprightMeaning": "家庭圆满、和谐幸福、情感共同体、归属安定、灵魂联结",
+    "reversedMeaning": "家庭矛盾、虚假和谐、愿景幻灭、情感裂痕、归属感缺失"
+  },
+  {
+    "cardNumber": 42,
+    "name": "宝剑首牌",
+    "englishName": "Ace of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/ace_of_swords.webp",
+    "uprightMeaning": "思维突破、真相胜利、理性决策、话语力量、意识觉醒",
+    "reversedMeaning": "思维混乱、伤害性言语、权威崩塌、沟通失败、滥用力量"
+  },
+  {
+    "cardNumber": 43,
+    "name": "宝剑二",
+    "englishName": "Two of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/two_of_swords.webp",
+    "uprightMeaning": "逃避抉择、僵持防御、信息屏蔽、心理防卫、暂时平静",
+    "reversedMeaning": "被迫面对、真相冲击、防御瓦解、决策压力、认知颠覆"
+  },
+  {
+    "cardNumber": 44,
+    "name": "宝剑三",
+    "englishName": "Three of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/three_of_swords.webp",
+    "uprightMeaning": "心碎痛苦、背叛伤害、悲伤核心、关系破裂、情感创伤",
+    "reversedMeaning": "释怀疗愈、接纳伤痛、修复可能、希望重生、原谅放下"
+  },
+  {
+    "cardNumber": 45,
+    "name": "宝剑四",
+    "englishName": "Four of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/four_of_swords.webp",
+    "uprightMeaning": "休养恢复、暂停沉思、能量蓄积、精神疗愈、内在整合",
+    "reversedMeaning": "被迫休息、逃避现实、能量停滞、孤立封闭、行动延迟"
+  },
+  {
+    "cardNumber": 46,
+    "name": "宝剑五",
+    "englishName": "Five of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/five_of_swords.webp",
+    "uprightMeaning": "自私胜利、两败俱伤、冲突消耗、道德阴影、短暂优势",
+    "reversedMeaning": "和解可能、避免冲突、代价认知、妥协修复、共赢思维"
+  },
+  {
+    "cardNumber": 47,
+    "name": "宝剑六",
+    "englishName": "Six of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/six_of_swords.webp",
+    "uprightMeaning": "艰难过渡、希望前行、疗愈旅程、渐进改变、情绪平复",
+    "reversedMeaning": "困守困境、延迟解决、逃避拖延、伤害持续、方向迷失"
+  },
+  {
+    "cardNumber": 48,
+    "name": "宝剑七",
+    "englishName": "Seven of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/seven_of_swords.webp",
+    "uprightMeaning": "隐秘行动、策略规避、计划单干、信息隐瞒、风险投机",
+    "reversedMeaning": "计划败露、自欺欺人、信任丧失、孤立无援、道德困境"
+  },
+  {
+    "cardNumber": 49,
+    "name": "宝剑八",
+    "englishName": "Eight of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/eight_of_swords.webp",
+    "uprightMeaning": "思维束缚、自我设限、受害心态、认知牢笼、恐惧瘫痪",
+    "reversedMeaning": "挣脱束缚、直面恐惧、心智解放、突破限制、主动承担"
+  },
+  {
+    "cardNumber": 50,
+    "name": "宝剑九",
+    "englishName": "Nine of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/nine_of_swords.webp",
+    "uprightMeaning": "噩梦焦虑、绝望恐惧、秘密折磨、心理崩溃、过度思虑",
+    "reversedMeaning": "压力释放、寻求帮助、希望重燃、真相面对、情绪疏导"
+  },
+  {
+    "cardNumber": 51,
+    "name": "宝剑十",
+    "englishName": "Ten of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/ten_of_swords.webp",
+    "uprightMeaning": "彻底结束、黎明重生、痛苦终结、被迫放手、黑暗尽头",
+    "reversedMeaning": "苟延残喘、拒绝结束、痛苦延续、绝望沉溺、重生延迟"
+  },
+  {
+    "cardNumber": 52,
+    "name": "星币首牌",
+    "englishName": "Ace of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/ace_of_pentacles.webp",
+    "uprightMeaning": "财富机遇、务实开始、物质基础、资源落地、稳定扎根",
+    "reversedMeaning": "错失良机、短视逐利、资源浪费、根基虚浮、潜能压抑"
+  },
+  {
+    "cardNumber": 53,
+    "name": "星币二",
+    "englishName": "Two of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/two_of_pentacles.webp",
+    "uprightMeaning": "灵活平衡、多任务处理、资源周转、适应变化、风险应对",
+    "reversedMeaning": "失衡失控、压力过载、计划崩坏、财务紧张、顾此失彼"
+  },
+  {
+    "cardNumber": 54,
+    "name": "星币三",
+    "englishName": "Three of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/three_of_pentacles.webp",
+    "uprightMeaning": "工匠合作、技能精进、专业认可、团队协作、成果奠基",
+    "reversedMeaning": "敷衍了事、缺乏专业、合作破裂、目标迷失、质量缺陷"
+  },
+  {
+    "cardNumber": 55,
+    "name": "星币四",
+    "englishName": "Four of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/four_of_pentacles.webp",
+    "uprightMeaning": "财务保守、固守资源、稳定控制、拒绝分享、安全执着",
+    "reversedMeaning": "过度吝啬、价值扭曲、机会隔绝、资源冻结、成长停滞"
+  },
+  {
+    "cardNumber": 56,
+    "name": "星币五",
+    "englishName": "Five of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/five_of_pentacles.webp",
+    "uprightMeaning": "贫困孤立、物质困境、资源匮乏、精神弃绝、生存危机",
+    "reversedMeaning": "转机希望、互助支持、援助接纳、困境缓解、信仰复苏"
+  },
+  {
+    "cardNumber": 57,
+    "name": "星币六",
+    "englishName": "Six of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/six_of_pentacles.webp",
+    "uprightMeaning": "慷慨施予、慈善平衡、资源分配、阶级差异、互利交换",
+    "reversedMeaning": "权力剥削、伪善操控、施舍终止、公平丧失、依赖成瘾"
+  },
+  {
+    "cardNumber": 58,
+    "name": "星币七",
+    "englishName": "Seven of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/seven_of_pentacles.webp",
+    "uprightMeaning": "耐心等待、长远评估、投资沉淀、成果酝酿、阶段审视",
+    "reversedMeaning": "急于求成、无效投入、回报失望、计划调整、资源错配"
+  },
+  {
+    "cardNumber": 59,
+    "name": "星币八",
+    "englishName": "Eight of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/eight_of_pentacles.webp",
+    "uprightMeaning": "专注技艺、精益求精、细节打磨、专业沉淀、价值积累",
+    "reversedMeaning": "敷衍功利、缺乏匠心、质量缺陷、半途而废、目标模糊"
+  },
+  {
+    "cardNumber": 60,
+    "name": "星币九",
+    "englishName": "Nine of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/nine_of_pentacles.webp",
+    "uprightMeaning": "物质独立、自律成就、享受回报、优雅富足、自我掌控",
+    "reversedMeaning": "虚荣挥霍、依赖他人、自由丧失、资源滥用、孤立空虚"
+  },
+  {
+    "cardNumber": 61,
+    "name": "星币十",
+    "englishName": "Ten of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/ten_of_pentacles.webp",
+    "uprightMeaning": "家族财富、世代传承、物质稳固、传统延续、根基深厚",
+    "reversedMeaning": "家族矛盾、财务纠纷、传承危机、价值观冲突、根基动摇"
+  },
+  {
+    "cardNumber": 62,
+    "name": "权杖侍从",
+    "englishName": "Page of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/page_of_wands.webp",
+    "uprightMeaning": "探索热情、新行动信号、好奇尝试、活力传达、冒险精神",
+    "reversedMeaning": "冲动半途而废、承诺缺失、计划混乱、热情冷却、幼稚轻率"
+  },
+  {
+    "cardNumber": 63,
+    "name": "权杖骑士",
+    "englishName": "Knight of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/knight_of_wands.webp",
+    "uprightMeaning": "勇敢冒险、急速推进、热情领袖、目标征服、行动魄力",
+    "reversedMeaning": "鲁莽冲突、计划混乱、方向迷失、耐心缺失、能量耗散"
+  },
+  {
+    "cardNumber": 64,
+    "name": "权杖王后",
+    "englishName": "Queen of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/queen_of_wands.webp",
+    "uprightMeaning": "热情领导、感染力强、自信闪耀、独立果断、创造力盛",
+    "reversedMeaning": "强势操控、情绪化、影响力衰退、嫉妒心盛、光芒遮蔽"
+  },
+  {
+    "cardNumber": 65,
+    "name": "权杖国王",
+    "englishName": "King of Wands",
+    "imagePath": "assets/tarot-card/rider_waite/king_of_wands.webp",
+    "uprightMeaning": "权威魄力、事业开拓、战略远见、创业精神、影响力扩张",
+    "reversedMeaning": "独断急躁、压制他人、决策武断、野心膨胀、权威崩塌"
+  },
+  {
+    "cardNumber": 66,
+    "name": "圣杯侍从",
+    "englishName": "Page of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/page_of_cups.webp",
+    "uprightMeaning": "灵感讯息、情感萌芽、直觉表达、纯真探索、创意启发",
+    "reversedMeaning": "敏感脆弱、逃避现实、灵感枯竭、情感封闭、幻想沉溺"
+  },
+  {
+    "cardNumber": 67,
+    "name": "圣杯骑士",
+    "englishName": "Knight of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/knight_of_cups.webp",
+    "uprightMeaning": "浪漫追求、理想主义、情感奉献、诗意表达、灵性引导",
+    "reversedMeaning": "情感欺骗、不切实际、承诺落空、逃避责任、理想幻灭"
+  },
+  {
+    "cardNumber": 68,
+    "name": "圣杯王后",
+    "englishName": "Queen of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/queen_of_cups.webp",
+    "uprightMeaning": "慈悲滋养、直觉引导、情感包容、疗愈支持、灵性深度",
+    "reversedMeaning": "过度牺牲、情感绑架、滋养变质、直觉蒙蔽、情绪泛滥"
+  },
+  {
+    "cardNumber": 69,
+    "name": "圣杯国王",
+    "englishName": "King of Cups",
+    "imagePath": "assets/tarot-card/rider_waite/king_of_cups.webp",
+    "uprightMeaning": "情感成熟、智慧包容、情绪平衡、领导魅力、灵性权威",
+    "reversedMeaning": "压抑情绪、冷漠伪善、情感失控、平衡丧失、权威瓦解"
+  },
+  {
+    "cardNumber": 70,
+    "name": "宝剑侍从",
+    "englishName": "Page of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/page_of_swords.webp",
+    "uprightMeaning": "机敏洞察、信息警觉、思维敏捷、真相探索、语言锐利",
+    "reversedMeaning": "谎言中伤、幼稚轻率、信息失真、判断失误、言语冒失"
+  },
+  {
+    "cardNumber": 71,
+    "name": "宝剑骑士",
+    "englishName": "Knight of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/knight_of_swords.webp",
+    "uprightMeaning": "凌厉行动、思维锐利、目标冲击、辩论强势、挑战权威",
+    "reversedMeaning": "破坏性冲动、言语暴力、计划崩坏、力量反噬、树敌众多"
+  },
+  {
+    "cardNumber": 72,
+    "name": "宝剑王后",
+    "englishName": "Queen of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/queen_of_swords.webp",
+    "uprightMeaning": "理性决断、公正独立、思维清晰、界限分明、真相直面",
+    "reversedMeaning": "冷酷刻薄、情感剥离、过度批判、偏见固执、公正丧失"
+  },
+  {
+    "cardNumber": 73,
+    "name": "宝剑国王",
+    "englishName": "King of Swords",
+    "imagePath": "assets/tarot-card/rider_waite/king_of_swords.webp",
+    "uprightMeaning": "战略权威、智性领导、法律逻辑、决策果断、思维统治",
+    "reversedMeaning": "操纵权谋、无情批判、理性溃败、强权压迫、沟通专制"
+  },
+  {
+    "cardNumber": 74,
+    "name": "星币侍从",
+    "englishName": "Page of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/page_of_pentacles.webp",
+    "uprightMeaning": "务实学习、技能积累、踏实钻研、成长潜力、资源规划",
+    "reversedMeaning": "拖延功利、学不致用、价值贬损、行动停滞、短视近利"
+  },
+  {
+    "cardNumber": 75,
+    "name": "星币骑士",
+    "englishName": "Knight of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/knight_of_pentacles.webp",
+    "uprightMeaning": "稳健执行、可靠承诺、耐心耕耘、务实推进、结果导向",
+    "reversedMeaning": "保守僵化、缺乏远见、效率低下、思维固化、成长受限"
+  },
+  {
+    "cardNumber": 76,
+    "name": "星币王后",
+    "englishName": "Queen of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/queen_of_pentacles.webp",
+    "uprightMeaning": "丰盛持家、务实滋养、资源管理、自然连接、物质保障",
+    "reversedMeaning": "物质依赖、忽视灵性、滋养中断、功利主义、家庭失衡"
+  },
+  {
+    "cardNumber": 77,
+    "name": "星币国王",
+    "englishName": "King of Pentacles",
+    "imagePath": "assets/tarot-card/rider_waite/king_of_pentacles.webp",
+    "uprightMeaning": "财富掌控、事业成就、资源统治、商业头脑、物质权威",
+    "reversedMeaning": "守财剥削、价值观扭曲、贪婪本质、信任危机、资源流失"
+  }
+]

@@ -11,6 +11,8 @@
 | [gcp](./gcp/SKILL.md) | Git Commit & Push 智能分组提交 + 自动同步推送 | 多文件变更自动分组 commit、工作区干净时自动 pull/push 同步 |
 | [figma-page-replication](./figma-page-replication/README.md) | Figma 设计稿 → 应用页面完整复刻工作流 | 活动页、落地页、招募页等任意 Figma → Code 场景 |
 | [image-to-code](./image-to-code/README.md) | UI 截图/设计图 → 代码 + 透明 PNG 切图资源 | 移动端截图还原、750px 像素级复刻、图标/插画提取 |
+| [tarot-mass-divination](./tarot-mass-divination/SKILL.md) | 大众占卜小红书长图文一键管线：选题 -> LLM 荐阵 -> 78 张无放回抽牌 -> DeepSeek 逐选项解读 -> 情绪画像封面 -> Playwright 渲染 | 大众占卜三选一/四选一长图文批量生产、短图文配图 |
+| [topic-discovery](./topic-discovery/SKILL.md) | 跨平台选题采集 -> Excel 选题库（12 列，链接+标题去重，未用/已用状态标记）-> LLM 推荐未用选题 | 小红书/抖音/B站/X/YouTube/公众号等选题沉淀与复用 |
 
 ---
 
@@ -53,7 +55,7 @@ BubbleUniverseSkills/
 │       ├── compare_images.py        # 像素级图片对比
 │       ├── preview_modules.py       # 模块边界预览
 │       └── audit_assets.py          # 资源审计
-└── image-to-code/
+├── image-to-code/
     ├── README.md                    # 安装指南 + 平台适配 + FAQ
     ├── SKILL.md                     # S→M→E→C→V→D 核心流程
     ├── references/
@@ -64,6 +66,14 @@ BubbleUniverseSkills/
         ├── extract_png_asset.py     # 精确 bbox 导出 PNG
         ├── audit_png_assets.py      # PNG 审计
         └── compare_images.py        # 像素级图片对比
+├── tarot-mass-divination/
+│   ├── SKILL.md                     # 大众占卜长图文一键管线工作流
+│   ├── data/                        # 牌阵/78 张韦特牌面/字体/LLM 提示词/情绪色彩库
+│   └── scripts/                     # pipeline 端到端 + 生成/渲染/封面校验脚本
+└── topic-discovery/
+    ├── SKILL.md                     # 跨平台选题采集入库工作流
+    └── scripts/
+        └── topic_library.py         # Excel 选题库管理（去重/状态标记/推荐）
 ```
 
 ---
