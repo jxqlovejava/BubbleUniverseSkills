@@ -49,10 +49,14 @@ pip install Pillow numpy
 
 ### Claude Code
 
+本 skill 是**自包含目录**（`references/`、`scripts/` 均随目录内嵌），安装只需把整个目录拷贝到 skills 目录：
+
 ```bash
-# 克隆到 skills 目录
-git clone https://github.com/你的组织/BubbleUniverseSkills.git \
-  ~/.claude/skills/BubbleUniverseSkills
+# 1) 拉取 BubbleUniverseSkills 仓库（整仓包含多个 skill，本 skill 只是其中之一）
+git clone --depth 1 https://github.com/jxqlovejava/BubbleUniverseSkills.git ~/BubbleUniverseSkills
+
+# 2) 拷贝本 skill 目录（含 SKILL.md / README.md / references / scripts）
+cp -R ~/BubbleUniverseSkills/image-to-code ~/.claude/skills/
 ```
 
 使用：在对话中说「用 image-to-code 还原这张截图」或「按 750px 还原这张 UI 图」。
@@ -82,7 +86,7 @@ git clone https://github.com/你的组织/BubbleUniverseSkills.git \
 直接在当前对话中引用 SKILL.md：
 
 ```
-请严格按照 ~/.claude/skills/BubbleUniverseSkills/image-to-code/SKILL.md 中的
+请严格按照 ~/.claude/skills/image-to-code/SKILL.md 中的
 S→M→E→C→V→D 流程，将这张 UI 截图还原为代码。
 ```
 
@@ -177,7 +181,7 @@ scripts/compare_images.py reference-750.png render-750.png --json
 
 ## 统一 Manifest 规范
 
-本 skill 使用 BubbleUniverseSkills 统一的 `layers.manifest.json` 格式。详见 [references/manifest-spec.md](references/manifest-spec.md)。
+本 skill 使用 BubbleUniverseSkills 统一的 `layers.manifest.json` 格式。规范完整内容已内嵌于本 skill，详见 [references/manifest-spec.md](references/manifest-spec.md)。
 
 ## License
 

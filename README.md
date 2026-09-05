@@ -33,7 +33,8 @@
 
 所有 design-to-code Skill 共用统一的 manifest 格式：
 
-- **位置**：`references/manifest-spec.md`
+- **权威位置**：仓库根 `references/manifest-spec.md`（修改规范时只改这里）
+- **内嵌分发**：`figma-page-replication/references/manifest-spec.md` 与 `image-to-code/references/manifest-spec.md` 各内嵌一份**完整副本**，保证任一 skill 单独拷贝即可自包含使用。修改根目录权威文件后，需同步两份内嵌副本。
 - **作用**：连接分析 → 资源导出 → 代码实现 → 验收验证 的全流程数据契约
 - **兼容**：`figma-page-replication`（`source.type = "figma"`）和 `image-to-code`（`source.type = "image"`）
 
@@ -50,7 +51,7 @@ BubbleUniverseSkills/
 │   ├── README.md                    # 安装指南 + 平台适配 + FAQ
 │   ├── SKILL.md                     # P→A→I→E→V→B 核心流程 + 代码模板
 │   ├── references/
-│   │   └── manifest-spec.md         # 引用统一规范
+│   │   └── manifest-spec.md         # 统一规范（完整内容内嵌，单目录自包含）
 │   └── scripts/
 │       ├── compare_images.py        # 像素级图片对比
 │       ├── preview_modules.py       # 模块边界预览
@@ -59,7 +60,7 @@ BubbleUniverseSkills/
     ├── README.md                    # 安装指南 + 平台适配 + FAQ
     ├── SKILL.md                     # S→M→E→C→V→D 核心流程
     ├── references/
-    │   ├── manifest-spec.md         # 引用统一规范
+    │   ├── manifest-spec.md         # 统一规范（完整内容内嵌，单目录自包含）
     │   └── slicing.md               # 切图与导出规范
     └── scripts/
         ├── preview_bboxes.py        # bbox 预览

@@ -27,6 +27,14 @@ Figma 设计稿 → 应用页面完整复刻工作流。适用于 **Claude Code 
 
 ## 前置条件
 
+### 校验脚本依赖（所有平台通用）
+
+`scripts/` 下的校验脚本需要 Python 图像库：
+
+```bash
+pip install Pillow numpy
+```
+
 ### Figma MCP 配置（所有平台通用）
 
 工作流依赖 Figma MCP 工具获取设计数据。在任何 Agent 中使用前，需要先配置 Figma MCP 服务器。
@@ -72,10 +80,14 @@ Figma 设计稿 → 应用页面完整复刻工作流。适用于 **Claude Code 
 
 ### Claude Code
 
+本 skill 是**自包含目录**（`references/`、`scripts/` 均随目录内嵌），安装只需把整个目录拷贝到 skills 目录：
+
 ```bash
-# 克隆到 skills 目录
-git clone https://github.com/你的组织/figma-page-replication.git \
-  ~/.claude/skills/figma-page-replication
+# 1) 拉取 BubbleUniverseSkills 仓库（整仓包含多个 skill，本 skill 只是其中之一）
+git clone --depth 1 https://github.com/jxqlovejava/BubbleUniverseSkills.git ~/BubbleUniverseSkills
+
+# 2) 拷贝本 skill 目录（含 SKILL.md / README.md / references / scripts）
+cp -R ~/BubbleUniverseSkills/figma-page-replication ~/.claude/skills/
 ```
 
 自动激活。也可以手动调用：在对话中输入 `figma-page-replication` 或直接说「复刻 Figma 页面」。
@@ -166,9 +178,15 @@ Agent 将按 P→A→I→E→V→B 流程引导你完成复刻。
 ## 文件结构
 
 ```
-figma-page-replication/
-├── README.md    # 本文件（安装指南 + 平台适配 + FAQ）
-└── SKILL.md     # 工作流定义（P→A→I→E→V→B 核心流程 + 代码模板）
+figma-page-replication/          # 自包含：整个目录可单独拷贝/克隆使用
+├── README.md                    # 本文件（安装指南 + 平台适配 + FAQ）
+├── SKILL.md                     # 工作流定义（P→A→I→E→V→B 核心流程 + 代码模板）
+├── references/
+│   └── manifest-spec.md         # layers.manifest.json 统一规范（完整内容内嵌）
+└── scripts/
+    ├── compare_images.py        # 像素级图片对比（V2）
+    ├── preview_modules.py       # 模块边界预览（A5 / V2.5）
+    └── audit_assets.py          # 资源审计（I 阶段）
 ```
 
 ## 常见问题

@@ -223,7 +223,7 @@ get_design_context(nodeId, fileKey) → 解析所有子节点
 - `strategy` 必须通过 A3 判定规则分配（`A` | `B` | `C`）
 - 策略 C 建议写 `reuse` 字段标明复用组件名/路径
 - 策略 B / C 的模块**必须**在 E2 阶段写 `spec_file` 并在 manifest 中记录路径
-- 统一使用 BubbleUniverseSkills [manifest 规范](../references/manifest-spec.md)
+- 统一使用本 skill 内置 [manifest 规范](references/manifest-spec.md)（已随本 skill 内嵌完整内容）
 
 ### A5: 预览模块边界
 
@@ -754,10 +754,10 @@ scripts/preview_modules.py device-screenshot.png layers.manifest.json qa/device-
 
 本 skill 使用 BubbleUniverseSkills 统一的 `layers.manifest.json` 格式作为所有模块的唯一数据源。
 
-- **规范位置**：`references/manifest-spec.md`
+- **规范位置**：`references/manifest-spec.md`（**完整内容已内嵌本 skill**，单目录拷贝即可独立使用，无外部依赖）
 - **核心原则**：`source_bbox` 来自 Figma 提取 → `scaled_bbox` 由 scale 计算 → 代码实现必须追溯到 manifest
 - **策略字段**：`strategy` 支持 `A` | `B` | `C`；`C` 建议附 `reuse` 组件标识
-- **与 image-to-code skill 共享**：相同的 manifest 格式，不同的 `source.type`（`figma` vs `image`）
+- **与 image-to-code skill 共享**：相同的 manifest 格式，不同的 `source.type`（`figma` vs `image`）；需要时双方各自使用随目录内嵌的同一份规范
 
 当用户同时提供 Figma 链接和图片参考时，两个 skill 可以基于同一 manifest 协作：
 - `figma-page-replication` 负责从 Figma 提取结构化数据和初始 manifest
