@@ -1,0 +1,53 @@
+// 模拟器指针操作（JXA + CGEvent，零依赖）：click / drag / paste
+// 中文输入不在本脚本：模拟器只认剪贴板粘贴，见 auto_record.py 的 input_topic
+// 用法:
+//   osascript -l JavaScript pointer.jxa click <x> <y>          # macOS 屏幕坐标点击
+//   osascript -l JavaScript pointer.jxa drag <x1> <y1> <x2> <y2> [steps]  # 拖动（steps 默认 20，越大越慢）
+//   osascript -l JavaScript pointer.jxa paste                  # Cmd+V 粘贴
+// 注意: click/drag/paste 需要终端 App 有「辅助功能」权限。
+ObjC.import('CoreGraphics')
+ObjC.import('Foundation')
+
+var rawArgs = $.NSProcessInfo.processInfo.arguments
+var argv = []
+for (var i = 4; i < rawArgs.count; i++) argv.push(ObjC.unwrap(rawArgs.objectAtIndex(i)))
+var mode = argv[0]
+
+function post(ev) { $.CGEventPost($.kCGHIDEventTap, ev) }
+function sleep(sec) { $.NSThread.sleepForTimeInterval(sec) }
+
+if (mode === 'click') {
+  var x = parseFloat(argv[1]), y = parseFloat(argv[2])
+  var p = $.CGPointMake(x, y)
+  post($.CGEventCreateMouseEvent($(), $.kCGEventMouseMoved, p, $.kCGMouseButtonLeft))
+  sleep(0.05)
+  post($.CGEventCreateMouseEvent($(), $.kCGEventLeftMouseDown, p, $.kCGMouseButtonLeft))
+  sleep(0.08)
+  post($.CGEventCreateMouseEvent($(), $.kCGEventLeftMouseUp, p, $.kCGMouseButtonLeft))
+} else if (mode === 'drag') {
+  var x1 = parseFloat(argv[1]), y1 = parseFloat(argv[2])
+  var x2 = parseFloat(argv[3]), y2 = parseFloat(argv[4])
+  var steps = argv.length > 5 ? parseInt(argv[5], 10) : 20  // steps 越多拖得越慢越轻
+  var start = $.CGPointMake(x1, y1)
+  post($.CGEventCreateMouseEvent($(), $.kCGEventMouseMoved, start, $.kCGMouseButtonLeft))
+  sleep(0.1)
+  post($.CGEventCreateMouseEvent($(), $.kCGEventLeftMouseDown, start, $.kCGMouseButtonLeft))
+  sleep(0.15)
+  for (var s = 1; s <= steps; s++) {
+    var t = s / steps
+    var q = $.CGPointMake(x1 + (x2 - x1) * t, y1 + (y2 - y1) * t)
+    post($.CGEventCreateMouseEvent($(), $.kCGEventLeftMouseDragged, q, $.kCGMouseButtonLeft))
+    sleep(0.02)
+  }
+  sleep(0.1)
+  post($.CGEventCreateMouseEvent($(), $.kCGEventLeftMouseUp, $.CGPointMake(x2, y2), $.kCGMouseButtonLeft))
+} else if (mode === 'paste') {
+  // keycode 9 = V，带 Command 标志
+  var down = $.CGEventCreateKeyboardEvent($(), 9, true)
+  $.CGEventSetFlags(down, $.kCGEventFlagMaskCommand)
+  post(down)
+  sleep(0.05)
+  var up = $.CGEventCreateKeyboardEvent($(), 9, false)
+  $.CGEventSetFlags(up, $.kCGEventFlagMaskCommand)
+  post(up)
+}

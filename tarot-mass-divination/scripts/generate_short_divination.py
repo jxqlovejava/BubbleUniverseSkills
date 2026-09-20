@@ -43,6 +43,12 @@ SPREADS_3_4 = {s["name"]: s for s in SPREADS if 3 <= len(s["positions"]) <= 4}
 BANNED = ("行动指引", "心灵启示", "这组牌告诉我们", "抽到的牌", "牌面显示", "综合解读", "接下来")
 # 开头固定的两组（渲染成粉色标题块）
 SHORT_GROUPS = ("**关键词**", "**星座与四元素**")
+# 散文第一句禁用开头（报幕腔/人群画像抢跑--第一句必须是直球答案，可出现在第二句之后）
+BAD_PROSE_OPENERS = ("会点开这组", "点开这组", "会问", "你问", "答案是", "直接回答", "先说结论",
+                      "我的答案", "如果你")
+# 状态回顾式时间开头（如「上半年你大概一直在渡一条窄河」）：时间词后紧跟「你」= 描写状态非答案。
+# 时间词裸开头（如「上半年正缘靠近」）是时间类问题的合法答案，不能误伤。
+STATE_TIME_RE = re.compile(r"^(上半年|这半年|过去那?半年?|最近你?)(你|的你)")
 
 
 def cleanup_short(text: str) -> str:
@@ -67,6 +73,90 @@ def prose_part(text: str) -> str:
         return ""
     m = re.search(r"\n\s*\n", text[idx:])
     return text[idx + m.end():] if m else ""
+
+
+def first_sentence(text: str) -> str:
+    """散文第一句（到第一个句末标点为止）。"""
+    prose = prose_part(text).strip()
+    m = re.search(r"[。！？!?]", prose)
+    return prose[:m.end()] if m else prose[:60]
+
+
+CARD_NAMES = tuple(c["name"] for c in CARD_BY_NUM.values())
+
+
+def _dirty_open(s: str) -> bool:
+    """单句是否带抢跑痕迹（报幕腔/人群画像/状态时间开头/描述牌面）。供首句校验与专修答案句复用。"""
+    if any(s.startswith(p) for p in BAD_PROSE_OPENERS) or STATE_TIME_RE.match(s):
+        return True
+    if s.startswith(CARD_NAMES):
+        return True
+    if "正位" in s or "逆位" in s:
+        return True
+    return any(c in s for c in ("答案是", "这组牌", "直接回答你"))
+
+
+def swap_first_sentence(text: str, new_first: str) -> str:
+    """答案句提到散文第一位，原第一句（人群画像/报幕）降为第二句--内容零丢失，
+    且人群画像放答案之后本就合规。"""
+    idx = text.find("**星座与四元素**")
+    if idx == -1:
+        return text
+    m = re.search(r"\n\s*\n", text[idx:])
+    if not m:
+        return text
+    prose_start = idx + m.end()
+    prose = text[prose_start:].lstrip()
+    sm = re.search(r"[。！？!?]", prose)
+    end = sm.end() if sm else 0
+    old_first = prose[:end]
+    return text[:prose_start] + new_first.strip().rstrip("。！？!?") + "。" + old_first + prose[end:]
+
+
+def replace_first_sentence(text: str, new_first: str) -> str:
+    """把散文第一句替换为 new_first，其余原样保留（首句专修的确定性合并--
+    LLM 专修常只回一句而非全文，直接采用会丢整篇，必须拼回原文）。"""
+    idx = text.find("**星座与四元素**")
+    if idx == -1:
+        return text
+    m = re.search(r"\n\s*\n", text[idx:])
+    if not m:
+        return text
+    prose_start = idx + m.end()
+    prose = text[prose_start:].lstrip()
+    sm = re.search(r"[。！？!?]", prose)
+    end = sm.end() if sm else 0
+    return text[:prose_start] + new_first.strip().rstrip("。！？!?") + "。" + prose[end:]
+
+
+def strip_mcue_first(text: str) -> str:
+    """确定性去报幕：第一句含「答案是」类报幕腔时，砍掉答案之前的报幕部分
+    （如「你问下半年事业运，答案是稳中向好」->「稳中向好」）。答案太短则不动。"""
+    first = first_sentence(text)
+    m = re.search(r"答案是[:：]?", first)
+    if not m:
+        return text
+    kept = first[m.end():].strip()
+    if len(kept) < 8:
+        return text
+    return replace_first_sentence(text, kept)
+
+
+def opener_issues(text: str) -> list[str]:
+    """散文第一句开头问题：报幕腔/人群画像/牌面描述抢跑。第一句必须是直球回答问题本身的答案句。"""
+    first = first_sentence(text)
+    hit = next((p for p in BAD_PROSE_OPENERS if first.startswith(p)), None)
+    if hit is None and STATE_TIME_RE.match(first):
+        hit = "时间词+状态描写"
+    if hit is not None:
+        return [f"散文第一句以「{hit}」开头，抢跑了。第一句必须是直球回答问题本身的答案句"
+                "（人群画像/状态描写/报幕腔只能放在第二句之后）"]
+    if "正位" in first or "逆位" in first or first.startswith(CARD_NAMES):
+        return ["散文第一句在描述牌面。第一句必须是直球回答问题本身的答案句，牌面放后面融进故事讲"]
+    mcue = next((p for p in ("答案是", "这组牌", "直接回答你") if p in first), None)
+    if mcue is not None:
+        return [f"散文第一句含报幕腔「{mcue}」。第一句就是答案本身，不要复述问题、不要描述看牌动作"]
+    return []
 
 
 def _cap_total(text: str, max_total: int = 535) -> str:
@@ -120,6 +210,9 @@ def is_complete_short(text: str, cards: list[dict]) -> bool:
         return False
     if "「" in text or "」" in text or "——" in text or "--" in text:
         return False
+    # 散文第一句必须直球答题（报幕腔/人群画像抢跑 = 不达标）
+    if opener_issues(text):
+        return False
     # 散文必须亲自点到每张牌（只在关键词/四元素组里点名不算）
     if missing_cards(prose_part(text), cards):
         return False
@@ -135,6 +228,7 @@ def build_hint(out: str, cards: list[dict]) -> str:
     if miss_groups:
         parts.append(f"缺开头分组：{'、'.join(miss_groups)}，必须先输出这两组（标题用 ** 加粗），再写散文")
     parts.extend(_kw_issues(out))
+    parts.extend(opener_issues(out))
     miss = missing_cards(prose_part(out), cards)
     if miss:
         parts.append(f"漏了牌：「{'、'.join(miss)}」散文里没点到，每张牌名都必须在散文里至少出现一次（只在关键词/四元素组里点名不算），写进画面不逐张报牌名解释")
@@ -174,6 +268,10 @@ def extract_highlights(text: str) -> list[str]:
     hl = _parse_highlights(raw, plain)
     print(f"    高亮 {len(hl)} 条")
     return hl
+
+
+# 首句修答案等窄任务用最小系统（完整 interpret_short 结构规则在此场景无关，省 ~6.5KB/次）
+SHORT_EDITOR_SYS = "你是小红书塔罗占卜文案的编辑，语气温暖治愈、口语化，只说人话。"
 
 
 def generate_short_interpretation(question: str, spread: dict, cards: list[dict]) -> str:
@@ -220,11 +318,53 @@ def generate_short_interpretation(question: str, spread: dict, cards: list[dict]
         out = cleanup_short(llm_call(sys_p, usr + f"\n\n【最终修正】{hint2}。只做最小改动，保持其余不动。",
                                      temperature=0.8, max_tokens=1200))
         print(f"    最终修正后 {len(out)} 字")
+    # 首句直答终检（2026-08-24）：最终修正路径不再校验，可能引入报幕腔/人群画像抢跑。
+    # 先确定性去报幕（「你问X，答案是Y」->「Y」，零成本），修不好再 LLM 专修第一句。
+    stripped = strip_mcue_first(out)
+    if len(stripped) != len(out):
+        print(f"    确定性去报幕 {len(out)} -> {len(stripped)} 字")
+        out = stripped
+    if opener_issues(out):
+        # 只要一句答案句（LLM 单句任务最不易翻车，重写全文常把原抢跑开头带回来），
+        # 确定性换位：答案句提到第一，原画像句降第二，内容零丢失
+        for _ in range(2):
+            ans = llm_call(
+                SHORT_EDITOR_SYS,
+                "用不超过30字的一句话直球回答这个占卜问题。要求：答案句本身开头，"
+                "不要复述问题，不要报幕腔（如 答案是/你问），不要人群画像（如 会点开这组的你），"
+                "不要描述牌面。只返回这一句话。问题：" + question,
+                temperature=0.7, max_tokens=80)
+            ans = cleanup_short(ans).split("\n")[0].strip()
+            if not ans or len(ans) > 45 or _dirty_open(ans):
+                continue
+            merged = swap_first_sentence(out, ans)
+            if not opener_issues(merged):
+                print(f"    首句换位 {len(out)} -> {len(merged)} 字")
+                out = merged
+                break
+            # 换位后超长则退回替换（丢原画像句保篇幅）
+            if len(merged) > 540:
+                merged = replace_first_sentence(out, ans)
+                if not opener_issues(merged):
+                    print(f"    首句替换 {len(out)} -> {len(merged)} 字")
+                    out = merged
+                    break
     # 最终确定性兜底：仍超长则按句号截散文尾部，保证 ≤535（统一 10.5px 字号能放下，且防渲染裁末行）
     capped = _cap_total(out, 535)
     if len(capped) < len(out):
         print(f"    兜底截断到 {len(capped)} 字")
     return capped
+
+
+def generate_short_option(question: str, spread: dict, cards: list[dict],
+                          with_highlights: bool = True) -> tuple[str, list[str]]:
+    """单选项完整产物：解读 + 高亮。解读必出；高亮仅 memo 主题渲染消费，羊皮纸/黑版
+    （含 batch_divination 非 memo 批次）传 --no-highlights 跳过摘录 LLM，省 1 次调用/选项。
+    高亮是锦上添花，需要时（memo 渲染）再带开重跑 generate 即可。"""
+    interp = generate_short_interpretation(question, spread, cards)
+    if not with_highlights:
+        return interp, []
+    return interp, extract_highlights(interp)
 
 
 def main() -> None:
@@ -237,6 +377,8 @@ def main() -> None:
     ap.add_argument("--theme", default="#E8788A")
     ap.add_argument("--n-options", type=int, default=3)
     ap.add_argument("--prompt", default="interpret_short.md")
+    ap.add_argument("--no-highlights", action="store_true",
+                    help="跳过每选项 LLM 高亮摘录（仅 memo 主题渲染需要；羊皮纸/黑版省 1 次调用/选项）")
     args = ap.parse_args()
 
     data_dir = pathlib.Path(args.data_dir)
@@ -265,14 +407,15 @@ def main() -> None:
         shown = "、".join(f"{c['name']}({'逆' if c['direction']=='REVERSED' else '正'})" for c in g)
         print(f"   选项{chr(65 + i)}：{shown}")
 
-    # ③ 解读（并发：每选项一次 LLM 调用，纯 I/O 等待，串行 3 组 ≈ 3 倍耗时）
-    print("③ 生成解读（每选项一次 LLM 调用，并发）...")
+    # ③ 解读+高亮（并发：每选项「解读->高亮」整链为一个并发单元；--no-highlights 跳过摘录 LLM）
+    print("③ 生成解读（并发）..." + ("已跳过 LLM 高亮摘录（--no-highlights）" if args.no_highlights else ""))
     with ThreadPoolExecutor(max_workers=len(groups)) as ex:
-        interps = list(ex.map(lambda g: generate_short_interpretation(args.question, spread, g), groups))
+        results = list(ex.map(lambda g: generate_short_option(
+            args.question, spread, g, with_highlights=not args.no_highlights), groups))
     options = []
     for i, g in enumerate(groups):
         lid = chr(65 + i)
-        interp = interps[i]
+        interp, highlights = results[i]
         cards_out = [{
             "img": f"../cards/{pathlib.Path(c['imagePath']).name}",
             "name": c["name"],
@@ -284,7 +427,7 @@ def main() -> None:
             "name": g[0]["name"],
             "cards": cards_out,
             "interpretation": interp,
-            "highlights": extract_highlights(interp),
+            "highlights": highlights,
         })
         print(f"   选项{lid} 解读 {len(interp)} 字 ✓")
 

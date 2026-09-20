@@ -13,6 +13,12 @@
 | [image-to-code](./image-to-code/README.md) | UI 截图/设计图 → 代码 + 透明 PNG 切图资源 | 移动端截图还原、750px 像素级复刻、图标/插画提取 |
 | [tarot-mass-divination](./tarot-mass-divination/SKILL.md) | 大众占卜小红书长图文一键管线：选题 -> LLM 荐阵 -> 78 张无放回抽牌 -> DeepSeek 逐选项解读 -> 情绪画像封面 -> Playwright 渲染 | 大众占卜三选一/四选一长图文批量生产、短图文配图 |
 | [topic-discovery](./topic-discovery/SKILL.md) | 跨平台选题采集 -> Excel 选题库（12 列，链接+标题去重，未用/已用状态标记）-> LLM 推荐未用选题 | 小红书/抖音/B站/X/YouTube/公众号等选题沉淀与复用 |
+| [jimeng-image](./jimeng-image/SKILL.md) | 即梦(jimeng.jianying.com) AI 生图：复用 ego-lite 浏览器登录态，Agent 模式 + 精确控制双脚本，配套大师心法预设库与 30 条示例 | 塔罗封面、自然感人像、情侣实拍、情绪插画等一切生图场景 |
+| [wechat-tarot-dual](./wechat-tarot-dual/SKILL.md) | 微信聊天 × 塔罗气泡解读 双拼抖音图文：左半聊天截图（剧本/头像/背景可换）+ 右半 App 解读截图（真实 interpret.md 管线） | 抖音塔罗双拼图文、聊天记录+占卜截图类爆款 |
+| [tarot-reading-shot](./tarot-reading-shot/README.md) | 抖音单屏塔罗解读截图：整屏 App 解读界面 + 正文红色关键词划线 + 牌卡区紫色情绪贴纸 | 抖音单屏截图直出图文帖 |
+| [natural-photo-product-shot](./natural-photo-product-shot/README.md) | 自然感实拍照片垫底 + 左约 43% 半透明白底「App 解读卡」浮层（照片为主角，解读卡为产品截图） | 抖音「实拍照片 + 产品界面」图文爆款 |
+| [couple-tarot-four-grid](./couple-tarot-four-grid/README.md) | 情侣四宫格：上排 2 格产品界面截图（HTML 原色渲染）+ 下排 2 格不露脸情侣场景照片 | 小红书四宫格图文、情感赛道 |
+| [douyin-screen-record-sticker](./douyin-screen-record-sticker/README.md) | 抖音录屏贴纸视频：左上角手写便利贴 + 产品洗牌→抽牌→解牌全流程自动走查录屏，输出 9:16 成片 | 抖音视频成片批量生产 |
 
 ---
 
@@ -71,11 +77,60 @@ BubbleUniverseSkills/
 │   ├── SKILL.md                     # 大众占卜长图文一键管线工作流
 │   ├── data/                        # 牌阵/78 张韦特牌面/字体/LLM 提示词/情绪色彩库
 │   └── scripts/                     # pipeline 端到端 + 生成/渲染/封面校验脚本
-└── topic-discovery/
-    ├── SKILL.md                     # 跨平台选题采集入库工作流
-    └── scripts/
-        └── topic_library.py         # Excel 选题库管理（去重/状态标记/推荐）
+├── topic-discovery/
+│   ├── SKILL.md                     # 跨平台选题采集入库工作流
+│   └── scripts/
+│       └── topic_library.py         # Excel 选题库管理（去重/状态标记/推荐）
+├── jimeng-image/
+│   ├── SKILL.md                     # 即梦 AI 生图工作流
+│   ├── prompt-presets.md            # 提示词大师心法 + 风格预设库
+│   ├── prompt-examples.md           # 30 条示例 + 共性规律 + 技法笔记
+│   └── scripts/                     # Agent 模式 / 精确控制 / 参考图识图
+├── wechat-tarot-dual/
+│   ├── SKILL.md                     # 微信聊天 × 塔罗解读 双拼图文工作流
+│   ├── assets/                      # 牌面/头像池/角色/表情贴纸/聊天背景
+│   └── scripts/
+├── tarot-reading-shot/
+│   ├── README.md                    # 单屏解读截图模板说明
+│   ├── assets/                      # 牌面/App 图标/Luna 头像
+│   └── gen_reading.py, render_reading_shot.py
+├── natural-photo-product-shot/
+│   ├── README.md                    # 实拍照片 + 解读卡浮层模板说明
+│   ├── assets/                      # 牌面/照片底图/App 图标
+│   └── gen_photo.py, render_photo_share.py
+├── couple-tarot-four-grid/
+│   ├── README.md                    # 四宫格图文模板说明
+│   ├── assets/                      # 牌面/App 界面截图/卡背
+│   └── gen_four_grid.py, render_four_grid.py
+└── douyin-screen-record-sticker/
+    ├── README.md                    # 录屏贴纸视频模板说明
+    ├── scripts/                     # OCR 校验 / 权限检查 / 指针控制
+    └── auto_record.py, gen_video.py, gen_cover.py
 ```
+
+---
+
+## 🎨 素材策略（哪些入库、哪些不入库）
+
+模板类 skill 需要素材才能跑通，但**生成出来的产物不入库**。入库判定只看一条：*重新跑一遍能不能再产出*。
+
+**入库**（skill 运行必需的输入资源）
+
+- 78 张韦特牌面 `assets/cards/`、牌阵与牌义 JSON、字体 `data/fonts/`
+- 头像池 / 角色 / 表情贴纸 / 聊天背景、App 界面截图、App 图标与 Luna 头像
+- 提示词库、`content.json` 示例、各 skill 的 `SKILL.md` / `README.md` / 脚本
+
+**不入库**（`.gitignore` 已固化，重跑即可复现）
+
+| 排除项 | 说明 | 复现方式 |
+|--------|------|---------|
+| `**/out/` | 渲染产物：成片 PNG / MP4、预览 HTML、发布文案 | 重跑各 skill 的 `gen_*.py` |
+| `**/assets/raw/`、`**/assets/photos_{a,b}/` | AI 生图原稿 | 重跑 `jimeng-image` 按提示词出图 |
+| `微信聊天塔罗素材/` | 按选题产出的成品素材包（含发布文案） | 重跑 `wechat-tarot-dual` |
+| `topic-discovery/data/选题库.xlsx` | 个人选题库数据 | 本地自行积累 |
+| `**/__pycache__/`、`*.pyc`、`.DS_Store` | 缓存与系统文件 | — |
+
+> 需补素材时，把本地工作区的对应目录按同名路径拷回本仓库即可；`rsync` 同步脚本用的是同一套排除规则。
 
 ---
 

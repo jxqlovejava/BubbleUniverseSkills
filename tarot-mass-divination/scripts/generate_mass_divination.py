@@ -65,6 +65,21 @@ def llm_call(system: str, user: str, temperature: float = 0.8, max_tokens: int =
         try:
             with urllib.request.urlopen(req, timeout=120) as resp:
                 data = json.loads(resp.read())
+            # Prompt Cache 用量日志（诊断用，设 LLM_CACHE_LOG=1 开启；DeepSeek/Kimi 自动前缀缓存返回
+            # usage.prompt_cache_hit/miss_tokens，OpenAI 走 prompt_tokens_details.cached_tokens）
+            if os.environ.get("LLM_CACHE_LOG"):
+                usage = data.get("usage") or {}
+                hit = usage.get("prompt_cache_hit_tokens") or 0
+                miss = usage.get("prompt_cache_miss_tokens") or 0
+                if not hit and not miss:
+                    det = usage.get("prompt_tokens_details") or {}
+                    hit = det.get("cached_tokens") or 0
+                    miss = max(0, (usage.get("prompt_tokens") or 0) - hit) if hit else 0
+                if hit or miss:
+                    total_p = hit + miss
+                    print(f"   [cache] hit={hit} miss={miss} "
+                          f"命中率={hit * 100 // total_p if total_p else 0}% "
+                          f"(system+user≈{len(system) + len(user)}字)")
             return data["choices"][0]["message"]["content"].strip()
         except Exception as e:  # noqa: BLE001
             last = e

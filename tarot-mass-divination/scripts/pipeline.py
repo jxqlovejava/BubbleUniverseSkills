@@ -11,15 +11,24 @@
   python3 pipeline.py --count 3 [--grid 3|4|random] [--out 8.14素材] [--dry-run]
 """
 import argparse
+import datetime
 import json
+import os
 import pathlib
 import random
 import re
 import subprocess
 import sys
+import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 import openpyxl
+
+# 即梦全局并发信号量（2026-08-25 用户定：12 路并发太高，限 3 路）。
+# 无论跨题 --workers 还是单题分格并发多少路，agent_generate 子进程总数被硬上限为 3。
+# 可用环境变量 JIMENG_CONCURRENCY 覆盖。
+_JIMENG_SEM = threading.BoundedSemaphore(int(os.environ.get("JIMENG_CONCURRENCY", "3")))
 
 BASE = pathlib.Path(__file__).resolve().parent.parent.parent.parent.parent  # ip-pipeline 根
 TOPIC_XLSX = BASE / "topic-library" / "选题库.xlsx"
@@ -99,14 +108,27 @@ def recommend_topics(n: int) -> list[str]:
         if not (4 <= len(q) <= 25):
             continue
         valid.append(q)
-    return valid[:n]
+    # 过期时间引用过滤：选题库积压的旧月份/今年已过季节题不再出（如九月还出「八月预言」）。
+    # ponytail: 跨年边界从简（一月时不过滤「十二月」），需要再补。
+    today = datetime.date.today()
+    stale = [m for i, m in enumerate(_CN_MONTHS, 1) if i < today.month]
+    stale += [f"{i}月" for i in range(1, today.month)]
+    si = (today.month % 12) // 3  # _SEASONS 下标：0冬 1春 2夏 3秋
+    stale += [f"今年{s}" for s in (_SEASONS[1:] if si == 0 else _SEASONS[1:si])]
+    return [q for q in valid if not any(tok in q for tok in stale)][:n]
+
+
+_CN_MONTHS = "一月 二月 三月 四月 五月 六月 七月 八月 九月 十月 十一月 十二月".split()
+_SEASONS = ["冬", "春", "夏", "秋"]  # 按 (month % 12) // 3 索引
 
 
 def pick_ref_cover() -> pathlib.Path:
-    covers = []
-    for ext in ("*.jpg", "*.jpeg", "*.png", "*.webp"):
-        covers.extend(REF_COVERS_DIR.glob(ext))
-    covers = sorted(set(covers))
+    """封面风格参考：只从「单图风格*.jpg」随机抽一张（用户 2026-08-25 定：每次封面随机参考一种单图风格）。
+
+    四宫格版式/选项样式由 render_cover.py 的 HTML/CSS 保证（对齐 四宫格大众占卜封面图.jpg），
+    其余参考图（四宫格版式图、旧漫画/影视人物图）不参与 --ref 风格锚定。
+    """
+    covers = [p for p in sorted(REF_COVERS_DIR.glob("单图风格*.jpg"))]
     return random.choice(covers) if covers else None
 
 
@@ -118,7 +140,8 @@ def gen_cover(question: str, grid: int, task_space: str, out_dir: pathlib.Path) 
     cmd = ["python3", str(AGENT_GEN), prompt, "--count", "1", "--out", str(out_dir), "--task-space", task_space]
     if ref:
         cmd += ["--ref", str(ref), "--describe"]
-    r = subprocess.run(cmd, capture_output=True, text=True, timeout=400)
+    with _JIMENG_SEM:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=400)
     import json
     for line in (r.stdout + r.stderr).splitlines():
         if '"status": "ok"' in line and '"images"' in line:
@@ -190,20 +213,26 @@ def gen_cover_emotion(question: str, grid: int, task_space: str, qdir: pathlib.P
     tmp.mkdir(exist_ok=True)
 
     def _gen_cell(arg: tuple[int, dict]) -> tuple[int, str]:
-        """单格即梦生图（独立 task-space，可并发——批量 --workers 3 跨题并发即梦已验证同模式）。"""
+        """单格即梦生图（独立 task-space）。单格失败自动重试最多 3 次（2026-08-25 起，
+        即梦偶发空返回/超时，重试显著降低空格占位率；重试也在 _JIMENG_SEM 内排队）。"""
         i, m = arg
         prompt = build_cell_prompt(question, m, i)
-        cmd = ["python3", str(AGENT_GEN), prompt, "--count", "1", "--out", str(tmp),
-               "--task-space", f"{task_space}-cell-{i}", "--ratio", "16:9" if grid == 3 else "3:4"]
-        if ref:
-            # 不带 --describe：识图描述会把参考图的三横幅结构喂给 AI，加剧条带模仿；只留 --ref 锚风格
-            cmd += ["--ref", str(ref)]
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-        for line in (r.stdout + r.stderr).splitlines():
-            if '"status": "ok"' in line and '"images"' in line:
-                imgs = json.loads(line).get("images", [])
-                if imgs:
-                    return i, imgs[0]
+        for attempt in range(3):
+            cmd = ["python3", str(AGENT_GEN), prompt, "--count", "1", "--out", str(tmp),
+                   "--task-space", f"{task_space}-cell-{i}", "--ratio", "16:9" if grid == 3 else "3:4"]
+            if ref:
+                # 不带 --describe：识图描述会把参考图的三横幅结构喂给 AI，加剧条带模仿；只留 --ref 锚风格
+                cmd += ["--ref", str(ref)]
+            with _JIMENG_SEM:
+                r = subprocess.run(cmd, capture_output=True, text=True, timeout=360)
+            for line in (r.stdout + r.stderr).splitlines():
+                if '"status": "ok"' in line and '"images"' in line:
+                    imgs = json.loads(line).get("images", [])
+                    if imgs:
+                        return i, imgs[0]
+            if attempt < 2:
+                print(f"  ⚠ 第{i + 1}格第{attempt + 1}次生成失败，重试...", flush=True)
+                time.sleep(5)
         return i, ""
 
     try:
@@ -330,9 +359,12 @@ def main():
     ap.add_argument("--out", default=str(OUT_DEFAULT), help="输出目录")
     ap.add_argument("--workers", type=int, default=3, help="并行度")
     ap.add_argument("--dry-run", action="store_true", help="只推荐选题，不生成")
+    ap.add_argument("--exclude", nargs="*", default=[],
+                    help="排除选题（精确匹配清洗后问题，用于跳过已完成/脏选题）")
     args = ap.parse_args()
 
-    topics = recommend_topics(args.count)
+    topics = [t for t in recommend_topics(args.count + len(args.exclude))
+              if t not in args.exclude][:args.count]
     print(f"推荐 {len(topics)} 个选题：")
     for i, t in enumerate(topics, 1):
         print(f"  {i}. {t}")
