@@ -83,27 +83,33 @@ BubbleUniverseSkills/
 │       └── topic_library.py         # Excel 选题库管理（去重/状态标记/推荐）
 ├── jimeng-image/
 │   ├── SKILL.md                     # 即梦 AI 生图工作流
+│   ├── README.md                    # 安装指南 + 平台适配 + FAQ
 │   ├── prompt-presets.md            # 提示词大师心法 + 风格预设库
 │   ├── prompt-examples.md           # 30 条示例 + 共性规律 + 技法笔记
 │   └── scripts/                     # Agent 模式 / 精确控制 / 参考图识图
 ├── wechat-tarot-dual/
 │   ├── SKILL.md                     # 微信聊天 × 塔罗解读 双拼图文工作流
+│   ├── README.md                    # 安装指南 + 平台适配 + FAQ
 │   ├── assets/                      # 牌面/头像池/角色/表情贴纸/聊天背景
 │   └── scripts/
 ├── tarot-reading-shot/
-│   ├── README.md                    # 单屏解读截图模板说明
+│   ├── SKILL.md                     # 单屏解读截图核心工作流
+│   ├── README.md                    # 安装指南 + 版面规范 + 踩坑记录
 │   ├── assets/                      # 牌面/App 图标/Luna 头像
 │   └── gen_reading.py, render_reading_shot.py
 ├── natural-photo-product-shot/
-│   ├── README.md                    # 实拍照片 + 解读卡浮层模板说明
+│   ├── SKILL.md                     # 实拍照片 + 解读卡浮层核心工作流
+│   ├── README.md                    # 安装指南 + 版面规范 + 踩坑记录
 │   ├── assets/                      # 牌面/照片底图/App 图标
 │   └── gen_photo.py, render_photo_share.py
 ├── couple-tarot-four-grid/
-│   ├── README.md                    # 四宫格图文模板说明
+│   ├── SKILL.md                     # 情侣四宫格核心工作流
+│   ├── README.md                    # 安装指南 + 版面规范 + 踩坑记录
 │   ├── assets/                      # 牌面/App 界面截图/卡背
 │   └── gen_four_grid.py, render_four_grid.py
 └── douyin-screen-record-sticker/
-    ├── README.md                    # 录屏贴纸视频模板说明
+    ├── SKILL.md                     # 录屏贴纸视频核心工作流
+    ├── README.md                    # 安装指南 + 故障表 + 踩坑记录
     ├── scripts/                     # OCR 校验 / 权限检查 / 指针控制
     └── auto_record.py, gen_video.py, gen_cover.py
 ```
